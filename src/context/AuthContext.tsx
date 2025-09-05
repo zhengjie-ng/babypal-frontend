@@ -24,6 +24,15 @@ interface LoginData {
   password: string
 }
 
+interface ForgotPasswordData {
+  email: string
+}
+
+interface ResetPasswordData {
+  password: string
+  token: string
+}
+
 interface Role {
   roleId: number
   roleName: string
@@ -44,6 +53,8 @@ interface User {
 interface AuthContextType {
   signup: (data: SignupData) => Promise<void>
   onLoginHandler: (data: LoginData) => Promise<void>
+  onPasswordForgotHandler: (data: ForgotPasswordData) => Promise<void>
+  onResetPasswordHandler: (data: ResetPasswordData) => Promise<void>
   onLogoutHandler: () => void
   token: string
   setToken: (token: string) => void
@@ -200,9 +211,62 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }
 
+  const onPasswordForgotHandler = async (
+    data: ForgotPasswordData
+  ): Promise<void> => {
+    const { email } = data
+    try {
+      setLoading(true)
+
+      const formData = new URLSearchParams()
+      formData.append("email", email)
+      await api.post("/auth/public/forgot-password", formData, {
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+      })
+
+      //showing success message
+      toast.success("Password reset email sent! Check your inbox.")
+    } catch (error) {
+      console.log(error)
+      toast.error("Error sending password reset email. Please try again.")
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const onResetPasswordHandler = async (data: ResetPasswordData): Promise<void> => {
+    const { password, token } = data
+
+    try {
+      setLoading(true)
+
+      const formData = new URLSearchParams()
+      formData.append("token", token)
+      formData.append("newPassword", password)
+      
+      await api.post("/auth/public/reset-password", formData, {
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+      })
+      
+      toast.success("Password reset successful! You can now log in.")
+      navigate("/login")
+    } catch (error) {
+      console.log(error)
+      toast.error("Error resetting password. Please try again.")
+    } finally {
+      setLoading(false)
+    }
+  }
+
   const contextValue: AuthContextType = {
     signup,
     onLoginHandler,
+    onPasswordForgotHandler,
+    onResetPasswordHandler,
     onLogoutHandler,
     token,
     setToken,

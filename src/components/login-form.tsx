@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Loader2 } from "lucide-react"
+import { Loader2, Eye, EyeOff } from "lucide-react"
 import { Link } from "react-router-dom"
 import { useContext, useState } from "react"
 import AuthContext from "@/context/AuthContext"
@@ -23,6 +23,7 @@ export function LoginForm({
     username: "",
     password: "",
   })
+  const [showPassword, setShowPassword] = useState(false)
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target
@@ -79,16 +80,31 @@ export function LoginForm({
                       Forgot password?
                     </Link>
                   </div>
-                  <Input
-                    id="password"
-                    placeholder="Enter your password"
-                    type="password"
-                    value={formData.password}
-                    onChange={handleInputChange}
-                    required
-                    className="shadow-sm"
-                    autoComplete="current-password"
-                  />
+                  <div className="relative">
+                    <Input
+                      id="password"
+                      placeholder="Enter your password"
+                      type={showPassword ? "text" : "password"}
+                      value={formData.password}
+                      onChange={handleInputChange}
+                      required
+                      className="shadow-sm pr-10"
+                      autoComplete="current-password"
+                    />
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                      onClick={() => setShowPassword(!showPassword)}
+                    >
+                      {showPassword ? (
+                        <EyeOff className="h-4 w-4 text-muted-foreground" />
+                      ) : (
+                        <Eye className="h-4 w-4 text-muted-foreground" />
+                      )}
+                    </Button>
+                  </div>
                 </div>
                 <Button
                   type="submit"
@@ -107,12 +123,12 @@ export function LoginForm({
                 </Button>
               </div>
               <div className="relative text-center">
-                <span className="bg-background text-muted-foreground px-2 text-sm">
-                  New to BabyPal?
-                </span>
                 <div className="absolute inset-0 flex items-center">
                   <span className="w-full border-t" />
                 </div>
+                <span className="relative bg-background text-muted-foreground px-2 text-sm">
+                  New to BabyPal?
+                </span>
               </div>
               <Button
                 variant="outline"

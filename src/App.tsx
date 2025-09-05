@@ -14,6 +14,8 @@ import { Navbar05 } from "@/components/nav-bar"
 import NavBaby from "./components/nav-baby"
 import { RecordProvider } from "./context/RecordContext"
 import { MeasurementProvider } from "./context/MeasurementContext"
+import ForgotPassword from "./routes/ForgotPassword"
+import ResetPassword from "./routes/ResetPassword"
 
 function App() {
   return (
@@ -28,6 +30,8 @@ function App() {
                   <Route path="/" element={<Landing />} />
                   <Route path="/login" element={<Login />} />
                   <Route path="/signup" element={<Signup />} />
+                  <Route path="/forgot-password" element={<ForgotPassword />} />
+                  <Route path="/reset-password" element={<ResetPassword />} />
                   <Route path="/" element={<Navbar05 />}>
                     <Route path="/" element={<NavBaby />}>
                       <Route path="/home" element={<Home />} />

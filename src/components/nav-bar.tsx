@@ -85,9 +85,6 @@ const UserMenu = ({
         </div>
       </DropdownMenuLabel>
       <DropdownMenuSeparator />
-      <DropdownMenuItem onClick={() => onItemClick?.("profile")}>
-        Profile
-      </DropdownMenuItem>
       <DropdownMenuItem onClick={() => onItemClick?.("logout")}>
         Log out
       </DropdownMenuItem>
