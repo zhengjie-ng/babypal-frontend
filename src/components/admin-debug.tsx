@@ -83,10 +83,7 @@ export function AdminDebug() {
             <div>
               <span className="text-muted-foreground">Role:</span>
               <span className="ml-2">
-                {debugInfo.authCurrentUser?.role?.roleName || 
-                 (debugInfo.authCurrentUser?.roles && debugInfo.authCurrentUser.roles.length > 0 
-                   ? debugInfo.authCurrentUser.roles[0] 
-                   : "Not loaded")}
+                {debugInfo.authCurrentUser?.role?.roleName || "Not loaded"}
               </span>
             </div>
           </div>
