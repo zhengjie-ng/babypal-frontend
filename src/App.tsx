@@ -10,6 +10,7 @@ import Admin from "./routes/Admin"
 import PageNotFound from "./routes/PageNotFound"
 import { AuthProvider } from "./context/AuthContext"
 import { BabyProvider } from "./context/BabyContext"
+import { AdminProvider } from "./context/AdminContext"
 import { Navbar05 } from "@/components/nav-bar"
 import NavBaby from "./components/nav-baby"
 import { RecordProvider } from "./context/RecordContext"
@@ -22,29 +23,31 @@ function App() {
     <div>
       <BrowserRouter>
         <AuthProvider>
-          <BabyProvider>
-            <RecordProvider>
-              <MeasurementProvider>
-                <Toaster position="bottom-center" />
-                <Routes>
-                  <Route path="/" element={<Landing />} />
-                  <Route path="/login" element={<Login />} />
-                  <Route path="/signup" element={<Signup />} />
-                  <Route path="/forgot-password" element={<ForgotPassword />} />
-                  <Route path="/reset-password" element={<ResetPassword />} />
-                  <Route path="/" element={<Navbar05 />}>
-                    <Route path="/" element={<NavBaby />}>
-                      <Route path="/home" element={<Home />} />
-                      <Route path="/dashboard" element={<Dashboard />} />
-                      <Route path="/measurements" element={<Measurements />} />
+          <AdminProvider>
+            <BabyProvider>
+              <RecordProvider>
+                <MeasurementProvider>
+                  <Toaster position="bottom-center" />
+                  <Routes>
+                    <Route path="/" element={<Landing />} />
+                    <Route path="/login" element={<Login />} />
+                    <Route path="/signup" element={<Signup />} />
+                    <Route path="/forgot-password" element={<ForgotPassword />} />
+                    <Route path="/reset-password" element={<ResetPassword />} />
+                    <Route path="/" element={<Navbar05 />}>
+                      <Route path="/" element={<NavBaby />}>
+                        <Route path="/home" element={<Home />} />
+                        <Route path="/dashboard" element={<Dashboard />} />
+                        <Route path="/measurements" element={<Measurements />} />
+                      </Route>
+                      <Route path="/admin" element={<Admin />} />
+                      <Route path="/*" element={<PageNotFound />} />
                     </Route>
-                    <Route path="/admin" element={<Admin />} />
-                    <Route path="/*" element={<PageNotFound />} />
-                  </Route>
-                </Routes>
-              </MeasurementProvider>
-            </RecordProvider>
-          </BabyProvider>
+                  </Routes>
+                </MeasurementProvider>
+              </RecordProvider>
+            </BabyProvider>
+          </AdminProvider>
         </AuthProvider>
       </BrowserRouter>
     </div>

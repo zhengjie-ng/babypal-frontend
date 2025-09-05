@@ -30,6 +30,17 @@ api.interceptors.request.use(
         return Promise.reject(new Error("No authentication token"))
       }
       config.headers.Authorization = `Bearer ${token}`
+      
+      // Debug: Log admin endpoint requests
+      if (config.url?.includes("/admin/")) {
+        console.log("🔐 Admin API Request Debug:", {
+          url: config.url,
+          method: config.method,
+          hasAuthHeader: !!config.headers.Authorization,
+          authHeaderPreview: config.headers.Authorization?.substring(0, 30) + "...",
+          allHeaders: Object.keys(config.headers)
+        })
+      }
     }
 
     // Add additional headers for CORS
@@ -80,6 +91,17 @@ api.interceptors.response.use(
         window.location.href = "/login"
       }
     }
+    
+    // Handle disabled user accounts
+    if (error.response?.status === 403 && error.response?.data?.message?.includes("disabled")) {
+      console.log("User account is disabled")
+      localStorage.removeItem("JWT_TOKEN")
+      localStorage.removeItem("USER")
+      localStorage.removeItem("CSRF_TOKEN")
+      localStorage.removeItem("IS_ADMIN")
+      window.location.href = "/login?disabled=true"
+    }
+    
     return Promise.reject(error)
   }
 )
