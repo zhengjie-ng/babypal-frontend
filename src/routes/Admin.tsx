@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { useContext, useState } from "react"
 import {
   Table,
@@ -7,10 +8,30 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Loader2, Mail, Calendar, Eye, UserCheck, UserX, Trash2, Users, Shield, ShieldCheck, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react"
+import {
+  Loader2,
+  Mail,
+  Calendar,
+  Eye,
+  UserCheck,
+  UserX,
+  Trash2,
+  Users,
+  Shield,
+  ShieldCheck,
+  ArrowUpDown,
+  ArrowUp,
+  ArrowDown,
+} from "lucide-react"
 import AdminContext from "@/context/AdminContext"
 import AuthContext from "@/context/AuthContext"
 import { format } from "date-fns"
@@ -56,7 +77,13 @@ interface User {
   twoFactorEnabled: boolean
 }
 
-type SortField = "userId" | "userName" | "email" | "role" | "createdDate" | "enabled"
+type SortField =
+  | "userId"
+  | "userName"
+  | "email"
+  | "role"
+  | "createdDate"
+  | "enabled"
 type SortDirection = "asc" | "desc"
 
 function Admin() {
@@ -83,8 +110,8 @@ function Admin() {
 
   // Sort users based on current sort field and direction
   const sortedUsers = [...(adminCtx?.users || [])].sort((a, b) => {
-    let aValue: any
-    let bValue: any
+    let aValue: string | number | boolean
+    let bValue: string | number | boolean
 
     switch (sortField) {
       case "userId":
@@ -124,7 +151,11 @@ function Admin() {
   // Get sort icon for column header
   const getSortIcon = (field: SortField) => {
     if (sortField !== field) return <ArrowUpDown className="h-4 w-4" />
-    return sortDirection === "asc" ? <ArrowUp className="h-4 w-4" /> : <ArrowDown className="h-4 w-4" />
+    return sortDirection === "asc" ? (
+      <ArrowUp className="h-4 w-4" />
+    ) : (
+      <ArrowDown className="h-4 w-4" />
+    )
   }
 
   const handleStatusToggle = async (userId: number, currentStatus: boolean) => {
@@ -157,7 +188,7 @@ function Admin() {
   const getUserRoleBadge = (user: User) => {
     console.log("Debug - User role:", user.role)
     const isAdmin = user.role && user.role.roleName === "ROLE_ADMIN"
-    
+
     return (
       <Badge variant={isAdmin ? "destructive" : "default"}>
         {isAdmin ? "Admin" : "User"}
@@ -174,8 +205,8 @@ function Admin() {
           </CardHeader>
           <CardContent>
             <p className="text-destructive">{adminCtx.error}</p>
-            <Button 
-              onClick={adminCtx.fetchUsers} 
+            <Button
+              onClick={adminCtx.fetchUsers}
               className="mt-4"
               variant="outline"
             >
@@ -192,7 +223,7 @@ function Admin() {
       <div className="space-y-6">
         {/* Debug Component - Remove this after debugging */}
         <AdminDebug />
-        
+
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
@@ -201,8 +232,8 @@ function Admin() {
               Manage users and system administration
             </p>
           </div>
-          <Button 
-            onClick={adminCtx?.fetchUsers} 
+          <Button
+            onClick={adminCtx?.fetchUsers}
             disabled={adminCtx?.loading}
             variant="outline"
           >
@@ -222,22 +253,24 @@ function Admin() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
               <div className="text-center">
-                <p className="text-2xl font-bold">{adminCtx?.users.length || 0}</p>
-                <p className="text-sm text-muted-foreground">Total Users</p>
+                <p className="text-2xl font-bold">
+                  {adminCtx?.users.length || 0}
+                </p>
+                <p className="text-muted-foreground text-sm">Total Users</p>
               </div>
               <div className="text-center">
                 <p className="text-2xl font-bold text-green-600">
-                  {adminCtx?.users.filter(user => user.enabled).length || 0}
+                  {adminCtx?.users.filter((user) => user.enabled).length || 0}
                 </p>
-                <p className="text-sm text-muted-foreground">Active Users</p>
+                <p className="text-muted-foreground text-sm">Active Users</p>
               </div>
               <div className="text-center">
                 <p className="text-2xl font-bold text-red-600">
-                  {adminCtx?.users.filter(user => !user.enabled).length || 0}
+                  {adminCtx?.users.filter((user) => !user.enabled).length || 0}
                 </p>
-                <p className="text-sm text-muted-foreground">Inactive Users</p>
+                <p className="text-muted-foreground text-sm">Inactive Users</p>
               </div>
             </div>
           </CardContent>
@@ -253,13 +286,13 @@ function Admin() {
           </CardHeader>
           <CardContent>
             {adminCtx?.loading ? (
-              <div className="flex flex-col items-center justify-center h-64">
-                <Loader2 className="h-8 w-8 animate-spin mb-2" />
+              <div className="flex h-64 flex-col items-center justify-center">
+                <Loader2 className="mb-2 h-8 w-8 animate-spin" />
                 <p className="text-muted-foreground">Loading users...</p>
               </div>
             ) : adminCtx?.users.length === 0 ? (
-              <div className="text-center py-8">
-                <Users className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
+              <div className="py-8 text-center">
+                <Users className="text-muted-foreground mx-auto mb-4 h-12 w-12" />
                 <p className="text-muted-foreground">No users found</p>
               </div>
             ) : (
@@ -338,7 +371,7 @@ function Admin() {
                 <TableBody>
                   {sortedUsers.map((user) => (
                     <TableRow key={user.userId}>
-                      <TableCell className="font-mono text-sm text-muted-foreground">
+                      <TableCell className="text-muted-foreground font-mono text-sm">
                         {user.userId}
                       </TableCell>
                       <TableCell className="font-medium">
@@ -346,23 +379,23 @@ function Admin() {
                       </TableCell>
                       <TableCell>
                         <div className="flex items-center gap-2">
-                          <Mail className="h-4 w-4 text-muted-foreground" />
+                          <Mail className="text-muted-foreground h-4 w-4" />
                           {user.email}
                         </div>
                       </TableCell>
-                      <TableCell>
-                        {getUserRoleBadge(user)}
-                      </TableCell>
+                      <TableCell>{getUserRoleBadge(user)}</TableCell>
                       <TableCell>
                         <div className="flex items-center gap-2">
-                          <Calendar className="h-4 w-4 text-muted-foreground" />
+                          <Calendar className="text-muted-foreground h-4 w-4" />
                           {formatDate(user.createdDate)}
                         </div>
                       </TableCell>
                       <TableCell>
-                        <Badge 
+                        <Badge
                           variant={user.enabled ? "default" : "secondary"}
-                          className={user.enabled ? "bg-green-100 text-green-800" : ""}
+                          className={
+                            user.enabled ? "bg-green-100 text-green-800" : ""
+                          }
                         >
                           {user.enabled ? "Active" : "Inactive"}
                         </Badge>
@@ -390,8 +423,15 @@ function Admin() {
                                 <Button
                                   variant="ghost"
                                   size="sm"
-                                  onClick={() => handleStatusToggle(user.userId, user.enabled)}
-                                  disabled={adminCtx?.loading || isCurrentUser(user)}
+                                  onClick={() =>
+                                    handleStatusToggle(
+                                      user.userId,
+                                      user.enabled
+                                    )
+                                  }
+                                  disabled={
+                                    adminCtx?.loading || isCurrentUser(user)
+                                  }
                                 >
                                   {user.enabled ? (
                                     <UserX className="h-4 w-4 text-orange-600" />
@@ -401,9 +441,11 @@ function Admin() {
                                 </Button>
                               </TooltipTrigger>
                               <TooltipContent>
-                                {isCurrentUser(user) 
-                                  ? "Cannot modify own status" 
-                                  : user.enabled ? "Disable User" : "Enable User"}
+                                {isCurrentUser(user)
+                                  ? "Cannot modify own status"
+                                  : user.enabled
+                                    ? "Disable User"
+                                    : "Enable User"}
                               </TooltipContent>
                             </Tooltip>
                           </TooltipProvider>
@@ -414,8 +456,15 @@ function Admin() {
                                 <Button
                                   variant="ghost"
                                   size="sm"
-                                  onClick={() => handleRoleToggle(user.userId, user.role.roleName)}
-                                  disabled={adminCtx?.loading || isCurrentUser(user)}
+                                  onClick={() =>
+                                    handleRoleToggle(
+                                      user.userId,
+                                      user.role.roleName
+                                    )
+                                  }
+                                  disabled={
+                                    adminCtx?.loading || isCurrentUser(user)
+                                  }
                                 >
                                   {user.role.roleName === "ROLE_ADMIN" ? (
                                     <Shield className="h-4 w-4 text-red-600" />
@@ -425,14 +474,16 @@ function Admin() {
                                 </Button>
                               </TooltipTrigger>
                               <TooltipContent>
-                                {isCurrentUser(user) 
-                                  ? "Cannot modify own role" 
-                                  : user.role.roleName === "ROLE_ADMIN" ? "Remove Admin" : "Make Admin"}
+                                {isCurrentUser(user)
+                                  ? "Cannot modify own role"
+                                  : user.role.roleName === "ROLE_ADMIN"
+                                    ? "Remove Admin"
+                                    : "Make Admin"}
                               </TooltipContent>
                             </Tooltip>
                           </TooltipProvider>
 
-                          <TooltipProvider>
+                          {/* <TooltipProvider>
                             <Tooltip>
                               <TooltipTrigger asChild>
                                 <AlertDialog>
@@ -446,32 +497,41 @@ function Admin() {
                                       <Trash2 className="h-4 w-4" />
                                     </Button>
                                   </AlertDialogTrigger>
-                            <AlertDialogContent>
-                              <AlertDialogHeader>
-                                <AlertDialogTitle>Delete User</AlertDialogTitle>
-                                <AlertDialogDescription>
-                                  Are you sure you want to delete user "{user.userName}"? 
-                                  This action cannot be undone and will permanently remove 
-                                  all user data.
-                                </AlertDialogDescription>
-                              </AlertDialogHeader>
-                              <AlertDialogFooter>
-                                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                <AlertDialogAction
-                                  onClick={() => handleDeleteUser(user.userId)}
-                                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                                >
-                                  Delete
-                                </AlertDialogAction>
-                              </AlertDialogFooter>
-                            </AlertDialogContent>
+                                  <AlertDialogContent>
+                                    <AlertDialogHeader>
+                                      <AlertDialogTitle>
+                                        Delete User
+                                      </AlertDialogTitle>
+                                      <AlertDialogDescription>
+                                        Are you sure you want to delete user "
+                                        {user.userName}"? This action cannot be
+                                        undone and will permanently remove all
+                                        user data.
+                                      </AlertDialogDescription>
+                                    </AlertDialogHeader>
+                                    <AlertDialogFooter>
+                                      <AlertDialogCancel>
+                                        Cancel
+                                      </AlertDialogCancel>
+                                      <AlertDialogAction
+                                        onClick={() =>
+                                          handleDeleteUser(user.userId)
+                                        }
+                                        className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                                      >
+                                        Delete
+                                      </AlertDialogAction>
+                                    </AlertDialogFooter>
+                                  </AlertDialogContent>
                                 </AlertDialog>
                               </TooltipTrigger>
                               <TooltipContent>
-                                {isCurrentUser(user) ? "Cannot delete own account" : "Delete User"}
+                                {isCurrentUser(user)
+                                  ? "Cannot delete own account"
+                                  : "Delete User"}
                               </TooltipContent>
                             </Tooltip>
-                          </TooltipProvider>
+                          </TooltipProvider> */}
                         </div>
                       </TableCell>
                     </TableRow>
@@ -485,42 +545,61 @@ function Admin() {
 
       {/* User Details Modal - This could be expanded to a separate component */}
       {selectedUser && (
-        <AlertDialog open={!!selectedUser} onOpenChange={() => setSelectedUser(null)}>
+        <AlertDialog
+          open={!!selectedUser}
+          onOpenChange={() => setSelectedUser(null)}
+        >
           <AlertDialogContent>
             <AlertDialogHeader>
               <AlertDialogTitle>User Details</AlertDialogTitle>
             </AlertDialogHeader>
             <div className="space-y-4">
               <div>
-                <p className="text-sm font-medium text-muted-foreground">Username</p>
+                <p className="text-muted-foreground text-sm font-medium">
+                  Username
+                </p>
                 <p className="text-sm">{selectedUser.userName}</p>
               </div>
               <div>
-                <p className="text-sm font-medium text-muted-foreground">Email</p>
+                <p className="text-muted-foreground text-sm font-medium">
+                  Email
+                </p>
                 <p className="text-sm">{selectedUser.email}</p>
               </div>
               <div>
-                <p className="text-sm font-medium text-muted-foreground">Role</p>
+                <p className="text-muted-foreground text-sm font-medium">
+                  Role
+                </p>
                 <div className="mt-1">{getUserRoleBadge(selectedUser)}</div>
               </div>
               <div>
-                <p className="text-sm font-medium text-muted-foreground">Status</p>
+                <p className="text-muted-foreground text-sm font-medium">
+                  Status
+                </p>
                 <div className="mt-1">
-                  <Badge 
+                  <Badge
                     variant={selectedUser.enabled ? "default" : "secondary"}
-                    className={selectedUser.enabled ? "bg-green-100 text-green-800" : ""}
+                    className={
+                      selectedUser.enabled ? "bg-green-100 text-green-800" : ""
+                    }
                   >
                     {selectedUser.enabled ? "Active" : "Inactive"}
                   </Badge>
                 </div>
               </div>
               <div>
-                <p className="text-sm font-medium text-muted-foreground">Created Date</p>
-                <p className="text-sm">{formatDate(selectedUser.createdDate)}</p>
+                <p className="text-muted-foreground text-sm font-medium">
+                  Created Date
+                </p>
+                <p className="text-sm">
+                  {formatDate(selectedUser.createdDate)}
+                </p>
               </div>
               <div>
-                <p className="text-sm font-medium text-muted-foreground">User ID</p>
-                <p className="text-sm font-mono">{selectedUser.userId}</p>
+                <p className="text-muted-foreground text-sm font-medium">
+                  User ID
+                </p>
+                <p className="font-mono text-sm">{selectedUser.userId}</p>
               </div>
             </div>
             <AlertDialogFooter>
