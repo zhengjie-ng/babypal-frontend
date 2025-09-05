@@ -64,13 +64,16 @@ export function BabyProvider({ children }: { children: ReactNode }) {
       setBabies(response.data)
 
       // If there are babies and no baby is currently selected, select the first one
-      if (response.data.length > 0 && !currentBaby) {
-        setCurrentBaby(response.data[0])
-      }
+      setCurrentBaby(prev => {
+        if (response.data.length > 0 && !prev) {
+          return response.data[0]
+        }
+        return prev
+      })
     } catch (error) {
       console.error("Error fetching babies:", error)
     }
-  }, [currentBaby])
+  }, [])
 
   useEffect(() => {
     // Only fetch babies if we have a token
