@@ -2,6 +2,7 @@ version: 2.1
 orbs:
   node: circleci/node@5.0.1
   docker: circleci/docker@2.1.4
+  snyk: snyk/snyk@1.5.0
 
 jobs:
   build:
@@ -22,7 +23,24 @@ jobs:
           pkg-manager: npm
       - run: |
           echo "Running tests..."
-          npm run test
+          npm run test -- --run
+
+  scan:
+    docker:
+      - image: cimg/node:16.10
+    environment:
+      IMAGE_NAME: nzj002/node-app-test-repository
+    steps:
+      - checkout
+      - setup_remote_docker
+      - docker/check:
+          docker-username: DOCKER_LOGIN
+          docker-password: DOCKER_PASSWORD
+      - run: docker build -t $DOCKER_IMAGE .
+      - snyk/scan:
+          docker-image-name: $DOCKER_IMAGE
+          fail-on-issues: false
+          severity-threshold: medium
   publish:
     executor: docker/docker
     steps:
@@ -43,6 +61,9 @@ workflows:
     jobs:
       - build
       - test:
+          requires:
+            - build
+      - scan:
           requires:
             - build
       - publish:
