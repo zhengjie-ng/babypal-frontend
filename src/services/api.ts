@@ -15,14 +15,6 @@ const api = axios.create({
 // Add a request interceptor to include JWT and CSRF tokens
 api.interceptors.request.use(
   async (config) => {
-    // Log request data for debugging
-    console.log("Request data:", {
-      url: config.url,
-      method: config.method,
-      data: JSON.parse(JSON.stringify(config.data || {})),
-      headers: JSON.parse(JSON.stringify(config.headers)),
-    })
-
     const token = localStorage.getItem("JWT_TOKEN")
     const isAuthEndpoint = config.url?.includes("/auth/public/")
 

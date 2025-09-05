@@ -188,9 +188,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setLoading(true)
       const response = await api.post("/auth/public/signup", data)
 
-      // Log the response to see what we're getting
-      console.log("Signup response:", response.data)
-
       // Check if the registration was successful
       if (response.status !== 201 && response.status !== 200) {
         throw new Error("Failed to create account")

@@ -83,18 +83,58 @@ jobs:
           command: ./node_modules/.bin/netlify deploy --site $NETLIFY_SITE_ID --auth $NETLIFY_ACCESS_TOKEN --prod --dir=dist
 
 workflows:
-  simple_workflow:
+  workflow-develop:
     jobs:
-      - build
+      - build:
+          filters:
+            branches:
+              only: develop
       - test:
           requires:
             - build
+          filters:
+            branches:
+              only: develop
       - scan:
           requires:
             - build
+          filters:
+            branches:
+              only: develop
       - publish:
           requires:
             - test
+          filters:
+            branches:
+              only: develop
+
+  workflow-release:
+    jobs:
+      - build:
+          filters:
+            branches:
+              only: release
+      - test:
+          requires:
+            - build
+          filters:
+            branches:
+              only: release
+      - scan:
+          requires:
+            - build
+          filters:
+            branches:
+              only: release
+      - publish:
+          requires:
+            - test
+          filters:
+            branches:
+              only: release
       - deploy:
           requires:
             - publish
+          filters:
+            branches:
+              only: release
