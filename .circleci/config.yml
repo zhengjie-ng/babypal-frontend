@@ -1,0 +1,50 @@
+version: 2.1
+orbs:
+  node: circleci/node@5.0.1
+  docker: circleci/docker@2.1.4
+
+jobs:
+  build:
+    docker:
+      - image: cimg/node:22.19
+    steps:
+      - checkout
+
+      - node/install-packages:
+          pkg-manager: npm
+
+  test:
+    docker:
+      - image: cimg/node:22.19
+    steps:
+      - checkout
+      - node/install-packages:
+          pkg-manager: npm
+      - run: |
+          echo "Running tests..."
+          npm run test
+  publish:
+    executor: docker/docker
+    steps:
+      - setup_remote_docker
+      - checkout
+      - docker/check:
+          docker-username: DOCKER_LOGIN
+          docker-password: DOCKER_PASSWORD
+      - docker/build:
+          image: $DOCKER_IMAGE
+          tag: << pipeline.git.revision >>,latest
+      - docker/push:
+          image: $DOCKER_IMAGE
+          tag: << pipeline.git.revision >>,latest
+
+workflows:
+  simple_workflow:
+    jobs:
+      - build
+      - test:
+          requires:
+            - build
+      - publish:
+          requires:
+            - test
