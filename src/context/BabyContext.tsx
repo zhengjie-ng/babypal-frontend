@@ -35,6 +35,7 @@ interface Baby {
 interface BabyContextType {
   babies: Baby[]
   currentBaby: Baby | null
+  loading: boolean
   fetchBabies: () => Promise<void>
   updateCurrentBabyRecords: () => Promise<void>
   onBabySelect: (babyId: number) => void
@@ -56,10 +57,12 @@ const BabyContext = createContext<BabyContextType | null>(null)
 export function BabyProvider({ children }: { children: ReactNode }) {
   const [babies, setBabies] = useState<Baby[]>([])
   const [currentBaby, setCurrentBaby] = useState<Baby | null>(null)
+  const [loading, setLoading] = useState(false)
   const authCtx = useContext(AuthContext)
 
   const fetchBabies = useCallback(async () => {
     try {
+      setLoading(true)
       const response = await api.get("/babies")
       setBabies(response.data)
 
@@ -72,6 +75,8 @@ export function BabyProvider({ children }: { children: ReactNode }) {
       })
     } catch (error) {
       console.error("Error fetching babies:", error)
+    } finally {
+      setLoading(false)
     }
   }, [])
 
@@ -87,6 +92,9 @@ export function BabyProvider({ children }: { children: ReactNode }) {
   }, [authCtx?.token, fetchBabies])
 
   const onBabySelect = (babyId: number) => {
+    // Prevent switching while loading to avoid race conditions
+    if (loading) return
+    
     const selectedBaby = babies.find((baby) => baby.id === babyId)
     setCurrentBaby(selectedBaby || null)
   }
@@ -220,6 +228,7 @@ export function BabyProvider({ children }: { children: ReactNode }) {
   const contextValue: BabyContextType = {
     babies,
     currentBaby,
+    loading,
     fetchBabies,
     updateCurrentBabyRecords,
     onBabySelect,
