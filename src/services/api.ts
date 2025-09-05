@@ -30,15 +30,16 @@ api.interceptors.request.use(
         return Promise.reject(new Error("No authentication token"))
       }
       config.headers.Authorization = `Bearer ${token}`
-      
+
       // Debug: Log admin endpoint requests
       if (config.url?.includes("/admin/")) {
         console.log("🔐 Admin API Request Debug:", {
           url: config.url,
           method: config.method,
           hasAuthHeader: !!config.headers.Authorization,
-          authHeaderPreview: config.headers.Authorization?.substring(0, 30) + "...",
-          allHeaders: Object.keys(config.headers)
+          authHeaderPreview:
+            config.headers.Authorization?.substring(0, 30) + "...",
+          allHeaders: Object.keys(config.headers),
         })
       }
     }
@@ -82,18 +83,21 @@ api.interceptors.response.use(
   (error) => {
     if (error.response?.status === 401) {
       console.log("Unauthorized access")
-      localStorage.removeItem("JWT_TOKEN")
-      localStorage.removeItem("USER")
-      localStorage.removeItem("CSRF_TOKEN")
-      localStorage.removeItem("IS_ADMIN")
-      // Only redirect if we're not already on the login page
-      if (!window.location.pathname.includes("/login")) {
-        window.location.href = "/login"
-      }
+      // localStorage.removeItem("JWT_TOKEN")
+      // localStorage.removeItem("USER")
+      // localStorage.removeItem("CSRF_TOKEN")
+      // localStorage.removeItem("IS_ADMIN")
+      // // Only redirect if we're not already on the login page
+      // if (!window.location.pathname.includes("/login")) {
+      //   window.location.href = "/login"
+      // }
     }
-    
+
     // Handle disabled user accounts
-    if (error.response?.status === 403 && error.response?.data?.message?.includes("disabled")) {
+    if (
+      error.response?.status === 403 &&
+      error.response?.data?.message?.includes("disabled")
+    ) {
       console.log("User account is disabled")
       localStorage.removeItem("JWT_TOKEN")
       localStorage.removeItem("USER")
@@ -101,7 +105,7 @@ api.interceptors.response.use(
       localStorage.removeItem("IS_ADMIN")
       window.location.href = "/login?disabled=true"
     }
-    
+
     return Promise.reject(error)
   }
 )
