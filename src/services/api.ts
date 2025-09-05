@@ -1,7 +1,7 @@
 import axios from "axios"
 
 const API_URL = import.meta.env.VITE_API_URL
-const CLIENT_URL = import.meta.env.VITE_CLIENT_URL
+// const CLIENT_URL = import.meta.env.VITE_CLIENT_URL
 
 const api = axios.create({
   baseURL: `${API_URL}/api`,
@@ -44,19 +44,11 @@ api.interceptors.request.use(
       }
     }
 
-    // Add additional headers for CORS
-    config.headers["Access-Control-Allow-Origin"] = CLIENT_URL
-    config.headers["Access-Control-Allow-Credentials"] = true
-
     let csrfToken = localStorage.getItem("CSRF_TOKEN")
     if (!csrfToken) {
       try {
         const response = await axios.get(`${API_URL}/api/csrf-token`, {
           withCredentials: true,
-          headers: {
-            "Access-Control-Allow-Origin": CLIENT_URL,
-            "Access-Control-Allow-Credentials": true,
-          },
         })
         csrfToken = response.data.token
         if (csrfToken) {
