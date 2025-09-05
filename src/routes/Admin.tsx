@@ -24,7 +24,7 @@ import {
   Eye,
   UserCheck,
   UserX,
-  Trash2,
+  // Trash2,
   Users,
   Shield,
   ShieldCheck,
@@ -37,14 +37,14 @@ import AuthContext from "@/context/AuthContext"
 import { format } from "date-fns"
 import {
   AlertDialog,
-  AlertDialogAction,
+  // AlertDialogAction,
   AlertDialogCancel,
   AlertDialogContent,
-  AlertDialogDescription,
+  // AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
+  // AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 import {
   Tooltip,
@@ -171,11 +171,11 @@ function Admin() {
     }
   }
 
-  const handleDeleteUser = async (userId: number) => {
-    if (adminCtx?.deleteUser) {
-      await adminCtx.deleteUser(userId)
-    }
-  }
+  // const handleDeleteUser = async (userId: number) => {
+  //   if (adminCtx?.deleteUser) {
+  //     await adminCtx.deleteUser(userId)
+  //   }
+  // }
 
   const formatDate = (dateString: string) => {
     try {
