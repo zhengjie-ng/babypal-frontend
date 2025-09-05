@@ -168,6 +168,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     if (user.username) {
       try {
+        setLoading(true)
         const { data } = await api.get("/auth/user")
         if (data.roles.includes("ROLE_ADMIN")) {
           localStorage.setItem("IS_ADMIN", "true")
@@ -180,6 +181,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       } catch (error) {
         console.error("Error fetching current user", error)
         toast.error("Error fetching current user")
+      } finally {
+        setLoading(false)
       }
     }
   }

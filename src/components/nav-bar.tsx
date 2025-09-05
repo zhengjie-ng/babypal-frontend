@@ -17,7 +17,7 @@ export interface Navbar05Props extends React.HTMLAttributes<HTMLElement> {
   onNavItemClick?: (href: string) => void
   onUserItemClick?: (item: string) => void
 }
-import { ChevronDownIcon } from "lucide-react"
+import { ChevronDownIcon, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
   NavigationMenu,
@@ -51,36 +51,59 @@ const UserMenu = ({
   email = "",
   userAvatar,
   onItemClick,
+  isLoading = false,
 }: {
   username?: string
   email?: string
   userAvatar?: string
   onItemClick?: (item: string) => void
+  isLoading?: boolean
 }) => (
   <DropdownMenu>
     <DropdownMenuTrigger asChild>
       <Button
         variant="ghost"
         className="hover:bg-accent hover:text-accent-foreground h-9 px-2 py-0"
+        disabled={isLoading}
       >
-        <Avatar className="h-7 w-7">
-          <AvatarImage src={userAvatar} alt={username} />
-          <AvatarFallback className="text-xs">
-            {username?.slice(0, 2).toUpperCase() || "GU"}
-          </AvatarFallback>
-        </Avatar>
-        <ChevronDownIcon className="ml-1 h-3 w-3" />
+        {isLoading ? (
+          <>
+            <div className="h-7 w-7 rounded-full bg-muted flex items-center justify-center">
+              <Loader2 className="h-4 w-4 animate-spin" />
+            </div>
+            <ChevronDownIcon className="ml-1 h-3 w-3" />
+          </>
+        ) : (
+          <>
+            <Avatar className="h-7 w-7">
+              <AvatarImage src={userAvatar} alt={username} />
+              <AvatarFallback className="text-xs">
+                {username?.slice(0, 2).toUpperCase() || "GU"}
+              </AvatarFallback>
+            </Avatar>
+            <ChevronDownIcon className="ml-1 h-3 w-3" />
+          </>
+        )}
         <span className="sr-only">User menu</span>
       </Button>
     </DropdownMenuTrigger>
     <DropdownMenuContent align="end" className="w-56">
       <DropdownMenuLabel>
         <div className="flex flex-col space-y-1">
-          <p className="text-sm leading-none font-medium">{username}</p>
-          {email && (
-            <p className="text-muted-foreground text-xs leading-none">
-              {email}
-            </p>
+          {isLoading ? (
+            <>
+              <div className="h-4 bg-muted rounded animate-pulse" />
+              <div className="h-3 bg-muted rounded animate-pulse w-3/4" />
+            </>
+          ) : (
+            <>
+              <p className="text-sm leading-none font-medium">{username}</p>
+              {email && (
+                <p className="text-muted-foreground text-xs leading-none">
+                  {email}
+                </p>
+              )}
+            </>
           )}
         </div>
       </DropdownMenuLabel>
@@ -294,6 +317,7 @@ export const Navbar05 = React.forwardRef<HTMLElement, Navbar05Props>(
                 email={authCtx?.currentUser?.email}
                 userAvatar={userAvatar}
                 onItemClick={handleUserItemClick}
+                isLoading={authCtx?.loading}
               />
             </div>
           </div>
