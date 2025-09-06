@@ -57,11 +57,24 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      console.log("Unauthorized access")
-      // localStorage.removeItem("JWT_TOKEN")
-      // localStorage.removeItem("USER")
-      // localStorage.removeItem("CSRF_TOKEN")
-      // window.location.href = "/login"
+      console.error("401 Unauthorized Error Details:", {
+        url: error.config?.url,
+        method: error.config?.method,
+        headers: error.config?.headers,
+        data: error.config?.data,
+        response: error.response?.data,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+      })
+      console.log("Clearing auth data and redirecting to login...")
+      localStorage.removeItem("JWT_TOKEN")
+      localStorage.removeItem("USER")
+      localStorage.removeItem("CSRF_TOKEN")
+      localStorage.removeItem("IS_ADMIN")
+      // Add a small delay to allow console logs to be visible
+      setTimeout(() => {
+        window.location.href = "/login"
+      }, 3000)
     }
     return Promise.reject(error)
   }
