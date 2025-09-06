@@ -19,19 +19,14 @@ api.interceptors.request.use(
       config.headers.Authorization = `Bearer ${token}`
     }
 
-    // Add additional headers for CORS
-    config.headers["Access-Control-Allow-Origin"] = API_URL
-    config.headers["Access-Control-Allow-Credentials"] = true
+    // Note: Access-Control-Allow-Origin should only be set by the server
+    // Removing client-side CORS headers as they can cause authentication issues
 
     let csrfToken = localStorage.getItem("CSRF_TOKEN")
     if (!csrfToken) {
       try {
         const response = await axios.get(`${API_URL}/api/csrf-token`, {
           withCredentials: true,
-          headers: {
-            "Access-Control-Allow-Origin": API_URL,
-            "Access-Control-Allow-Credentials": true,
-          },
         })
         csrfToken = response.data.token
         if (csrfToken) {
