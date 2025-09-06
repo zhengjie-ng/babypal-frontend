@@ -138,3 +138,10 @@ workflows:
           filters:
             branches:
               only: release
+
+  workflow-release-only:
+    jobs:
+      - deploy:
+          filters:
+            branches:
+              only: release-only
