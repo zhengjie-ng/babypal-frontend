@@ -129,6 +129,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
     localStorage.setItem("JWT_TOKEN", token)
     localStorage.setItem("USER", JSON.stringify(user))
+    // Clear old CSRF token to force fetching a new one
+    localStorage.removeItem("CSRF_TOKEN")
     setToken(token)
     navigate("/home")
   }
