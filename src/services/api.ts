@@ -22,17 +22,19 @@ api.interceptors.request.use(
     // Note: Access-Control-Allow-Origin should only be set by the server
     // Removing client-side CORS headers as they can cause authentication issues
 
-    // Get CSRF token from cookie (double-submit cookie pattern)
-    const getCookieValue = (name: string) => {
-      const value = `; ${document.cookie}`
-      const parts = value.split(`; ${name}=`)
-      if (parts.length === 2) return parts.pop()?.split(';').shift()
-      return undefined
-    }
-
-    const csrfToken = getCookieValue('XSRF-TOKEN')
-    if (csrfToken) {
-      config.headers["X-XSRF-TOKEN"] = csrfToken
+    // For cross-site requests, fetch CSRF token from API endpoint
+    // since cookies may not be accessible due to SameSite policies
+    if (config.method && ['post', 'put', 'patch', 'delete'].includes(config.method.toLowerCase())) {
+      try {
+        const response = await axios.get(`${API_URL}/api/csrf-token`, {
+          withCredentials: true,
+        })
+        if (response.data.token) {
+          config.headers["X-XSRF-TOKEN"] = response.data.token
+        }
+      } catch (error) {
+        console.error("Failed to fetch CSRF token", error)
+      }
     }
     return config
   },
