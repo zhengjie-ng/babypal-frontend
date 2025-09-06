@@ -22,9 +22,20 @@ api.interceptors.request.use(
     // Note: Access-Control-Allow-Origin should only be set by the server
     // Removing client-side CORS headers as they can cause authentication issues
 
-    // Temporarily disable CSRF token for cross-site requests
-    // TODO: Fix CSRF handling for production
-    // The CSRF token mechanism has cross-site compatibility issues
+    // For POST/PUT/PATCH/DELETE requests, fetch CSRF token from API endpoint
+    // This uses session-based CSRF tokens instead of cookies for cross-site compatibility
+    if (config.method && ['post', 'put', 'patch', 'delete'].includes(config.method.toLowerCase())) {
+      try {
+        const response = await axios.get(`${API_URL}/api/csrf-token`, {
+          withCredentials: true,
+        })
+        if (response.data.token) {
+          config.headers["X-XSRF-TOKEN"] = response.data.token
+        }
+      } catch (error) {
+        console.error("Failed to fetch CSRF token", error)
+      }
+    }
     return config
   },
   (error) => {
