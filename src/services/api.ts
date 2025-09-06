@@ -61,8 +61,26 @@ api.interceptors.response.use(
       // localStorage.removeItem("JWT_TOKEN")
       // localStorage.removeItem("USER")
       // localStorage.removeItem("CSRF_TOKEN")
-      // window.location.href = "/login"
+      // localStorage.removeItem("IS_ADMIN")
+      // // Only redirect if we're not already on the login page
+      // if (!window.location.pathname.includes("/login")) {
+      //   window.location.href = "/login"
+      // }
     }
+
+    // Handle disabled user accounts
+    if (
+      error.response?.status === 403 &&
+      error.response?.data?.message?.includes("disabled")
+    ) {
+      console.log("User account is disabled")
+      localStorage.removeItem("JWT_TOKEN")
+      localStorage.removeItem("USER")
+      localStorage.removeItem("CSRF_TOKEN")
+      localStorage.removeItem("IS_ADMIN")
+      window.location.href = "/login?disabled=true"
+    }
+
     return Promise.reject(error)
   }
 )
