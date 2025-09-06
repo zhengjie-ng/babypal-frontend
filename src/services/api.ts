@@ -22,18 +22,32 @@ api.interceptors.request.use(
     // Note: Access-Control-Allow-Origin should only be set by the server
     // Removing client-side CORS headers as they can cause authentication issues
 
-    // For POST/PUT/PATCH/DELETE requests, fetch CSRF token from API endpoint
-    // This uses session-based CSRF tokens instead of cookies for cross-site compatibility
+    // Get CSRF token from cookie with SameSite=None support
+    const getCookieValue = (name: string) => {
+      const value = `; ${document.cookie}`
+      const parts = value.split(`; ${name}=`)
+      if (parts.length === 2) return parts.pop()?.split(';').shift()
+      return undefined
+    }
+
+    // For modifying requests, try to get CSRF token from cookie first, then fallback to API
     if (config.method && ['post', 'put', 'patch', 'delete'].includes(config.method.toLowerCase())) {
-      try {
-        const response = await axios.get(`${API_URL}/api/csrf-token`, {
-          withCredentials: true,
-        })
-        if (response.data.token) {
-          config.headers["X-XSRF-TOKEN"] = response.data.token
+      let csrfToken = getCookieValue('XSRF-TOKEN')
+      
+      if (!csrfToken) {
+        // Fallback: fetch token from API if cookie not available
+        try {
+          const response = await axios.get(`${API_URL}/api/csrf-token`, {
+            withCredentials: true,
+          })
+          csrfToken = response.data.token
+        } catch (error) {
+          console.error("Failed to fetch CSRF token", error)
         }
-      } catch (error) {
-        console.error("Failed to fetch CSRF token", error)
+      }
+      
+      if (csrfToken) {
+        config.headers["X-XSRF-TOKEN"] = csrfToken
       }
     }
     return config
