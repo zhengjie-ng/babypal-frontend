@@ -69,7 +69,7 @@ api.interceptors.response.use(
       // Add a small delay to allow console logs to be visible
       setTimeout(() => {
         window.location.href = "/login"
-      }, 3000)
+      }, 1000000)
     }
     return Promise.reject(error)
   }
