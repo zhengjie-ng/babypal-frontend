@@ -22,21 +22,15 @@ api.interceptors.request.use(
     // Note: Access-Control-Allow-Origin should only be set by the server
     // Removing client-side CORS headers as they can cause authentication issues
 
-    let csrfToken = localStorage.getItem("CSRF_TOKEN")
-    if (!csrfToken) {
-      try {
-        const response = await axios.get(`${API_URL}/api/csrf-token`, {
-          withCredentials: true,
-        })
-        csrfToken = response.data.token
-        if (csrfToken) {
-          localStorage.setItem("CSRF_TOKEN", csrfToken)
-        }
-      } catch (error) {
-        console.error("Failed to fetch CSRF token", error)
-      }
+    // Get CSRF token from cookie (double-submit cookie pattern)
+    const getCookieValue = (name: string) => {
+      const value = `; ${document.cookie}`
+      const parts = value.split(`; ${name}=`)
+      if (parts.length === 2) return parts.pop()?.split(';').shift()
+      return undefined
     }
 
+    const csrfToken = getCookieValue('XSRF-TOKEN')
     if (csrfToken) {
       config.headers["X-XSRF-TOKEN"] = csrfToken
     }
@@ -64,8 +58,8 @@ api.interceptors.response.use(
       console.log("Clearing auth data and redirecting to login...")
       localStorage.removeItem("JWT_TOKEN")
       localStorage.removeItem("USER")
-      localStorage.removeItem("CSRF_TOKEN")
       localStorage.removeItem("IS_ADMIN")
+      // CSRF token is in cookies, will be cleared by browser
       // Add a small delay to allow console logs to be visible
       setTimeout(() => {
         window.location.href = "/login"

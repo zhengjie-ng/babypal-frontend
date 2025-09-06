@@ -85,7 +85,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     localStorage.removeItem("JWT_TOKEN")
     localStorage.removeItem("USER")
     localStorage.removeItem("IS_ADMIN")
-    localStorage.removeItem("CSRF_TOKEN")
+    // CSRF token is in cookies, will be cleared by server
 
     // Reset all state
     setToken("")
@@ -129,8 +129,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
     localStorage.setItem("JWT_TOKEN", token)
     localStorage.setItem("USER", JSON.stringify(user))
-    // Clear old CSRF token to force fetching a new one
-    localStorage.removeItem("CSRF_TOKEN")
+    // CSRF token now comes from cookies, no need to clear localStorage
     setToken(token)
     navigate("/home")
   }
