@@ -31,6 +31,11 @@ import {
   ArrowUpDown,
   ArrowUp,
   ArrowDown,
+  Clock,
+  CheckCircle,
+  XCircle,
+  AlertTriangle,
+  Settings,
 } from "lucide-react"
 import AdminContext from "@/context/AdminContext"
 import AuthContext from "@/context/AuthContext"
@@ -53,6 +58,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip"
 import { AdminDebug } from "@/components/admin-debug"
+import { AdminUserActionsDialog } from "@/components/admin-user-actions-dialog"
 
 interface Role {
   roleId: number
@@ -67,11 +73,11 @@ interface User {
   accountNonExpired: boolean
   credentialsNonExpired: boolean
   enabled: boolean
-  credentialsExpiryDate: string
-  accountExpiryDate: string
+  credentialsExpiryDate: string | null
+  accountExpiryDate: string | null
   twoFactorSecret: string | null
-  signUpMethod: string
-  role: Role
+  signUpMethod: string | null
+  role?: Role
   createdDate: string
   updatedDate: string
   twoFactorEnabled: boolean
@@ -92,6 +98,8 @@ function Admin() {
   const [selectedUser, setSelectedUser] = useState<User | null>(null)
   const [sortField, setSortField] = useState<SortField>("userId")
   const [sortDirection, setSortDirection] = useState<SortDirection>("asc")
+  const [actionsDialogOpen, setActionsDialogOpen] = useState(false)
+  const [actionsUser, setActionsUser] = useState<User | null>(null)
 
   // Helper function to check if user is the currently signed-in user
   const isCurrentUser = (user: User) => {
@@ -127,8 +135,8 @@ function Admin() {
         bValue = b.email.toLowerCase()
         break
       case "role":
-        aValue = a.role.roleName
-        bValue = b.role.roleName
+        aValue = a.role?.roleName || "ROLE_USER"
+        bValue = b.role?.roleName || "ROLE_USER"
         break
       case "createdDate":
         aValue = new Date(a.createdDate).getTime()
@@ -171,6 +179,12 @@ function Admin() {
     }
   }
 
+  const handleManageUser = (user: User) => {
+    setActionsUser(user)
+    setActionsDialogOpen(true)
+  }
+
+
   // const handleDeleteUser = async (userId: number) => {
   //   if (adminCtx?.deleteUser) {
   //     await adminCtx.deleteUser(userId)
@@ -185,6 +199,62 @@ function Admin() {
     }
   }
 
+  const formatExpiryDate = (dateString: string | null) => {
+    if (!dateString) return "Never expires"
+    try {
+      const date = new Date(dateString)
+      const now = new Date()
+      const isExpired = date < now
+      const formattedDate = format(date, "MMM dd, yyyy")
+      
+      if (isExpired) {
+        return `Expired: ${formattedDate}`
+      }
+      return formattedDate
+    } catch {
+      return dateString
+    }
+  }
+
+  const getStatusIcon = (status: boolean, type: 'account' | 'credentials' | 'locked' | 'enabled') => {
+    const iconClass = "h-4 w-4"
+    
+    if (type === 'locked') {
+      // For locked status, true means NOT locked (good), false means locked (bad)
+      return status ? (
+        <CheckCircle className={`${iconClass} text-green-600`} />
+      ) : (
+        <XCircle className={`${iconClass} text-red-600`} />
+      )
+    }
+    
+    return status ? (
+      <CheckCircle className={`${iconClass} text-green-600`} />
+    ) : (
+      <XCircle className={`${iconClass} text-red-600`} />
+    )
+  }
+
+  const getExpiryIcon = (dateString: string | null) => {
+    if (!dateString) return <CheckCircle className="h-4 w-4 text-blue-600" />
+    
+    try {
+      const date = new Date(dateString)
+      const now = new Date()
+      const isExpired = date < now
+      const daysDiff = Math.ceil((date.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
+      
+      if (isExpired) {
+        return <XCircle className="h-4 w-4 text-red-600" />
+      } else if (daysDiff <= 30) {
+        return <AlertTriangle className="h-4 w-4 text-yellow-600" />
+      }
+      return <CheckCircle className="h-4 w-4 text-green-600" />
+    } catch {
+      return <AlertTriangle className="h-4 w-4 text-gray-400" />
+    }
+  }
+
   const getUserRoleBadge = (user: User) => {
     console.log("Debug - User role:", user.role)
     const isAdmin = user.role && user.role.roleName === "ROLE_ADMIN"
@@ -193,6 +263,37 @@ function Admin() {
       <Badge variant={isAdmin ? "destructive" : "default"}>
         {isAdmin ? "Admin" : "User"}
       </Badge>
+    )
+  }
+
+  const getAccountStatusBadges = (user: User) => {
+    return (
+      <div className="flex flex-wrap gap-1">
+        <div className="flex items-center gap-1">
+          {getStatusIcon(user.enabled, 'enabled')}
+          <span className="text-xs">
+            {user.enabled ? 'Enabled' : 'Disabled'}
+          </span>
+        </div>
+        <div className="flex items-center gap-1">
+          {getStatusIcon(user.accountNonLocked, 'locked')}
+          <span className="text-xs">
+            {user.accountNonLocked ? 'Unlocked' : 'Locked'}
+          </span>
+        </div>
+        <div className="flex items-center gap-1">
+          {getStatusIcon(user.accountNonExpired, 'account')}
+          <span className="text-xs">
+            {user.accountNonExpired ? 'Valid' : 'Expired'}
+          </span>
+        </div>
+        <div className="flex items-center gap-1">
+          {getStatusIcon(user.credentialsNonExpired, 'credentials')}
+          <span className="text-xs">
+            {user.credentialsNonExpired ? 'Valid' : 'Expired'}
+          </span>
+        </div>
+      </div>
     )
   }
 
@@ -361,9 +462,21 @@ function Admin() {
                         className="h-auto p-0 font-semibold"
                         onClick={() => handleSort("enabled")}
                       >
-                        Status
+                        Account Status
                         {getSortIcon("enabled")}
                       </Button>
+                    </TableHead>
+                    <TableHead className="text-center">
+                      <div className="flex items-center gap-1 justify-center">
+                        <Clock className="h-4 w-4" />
+                        Credentials Expiry
+                      </div>
+                    </TableHead>
+                    <TableHead className="text-center">
+                      <div className="flex items-center gap-1 justify-center">
+                        <Calendar className="h-4 w-4" />
+                        Account Expiry
+                      </div>
                     </TableHead>
                     <TableHead className="text-center">Actions</TableHead>
                   </TableRow>
@@ -391,17 +504,42 @@ function Admin() {
                         </div>
                       </TableCell>
                       <TableCell>
-                        <Badge
-                          variant={user.enabled ? "default" : "secondary"}
-                          className={
-                            user.enabled ? "bg-green-100 text-green-800" : ""
-                          }
-                        >
-                          {user.enabled ? "Active" : "Inactive"}
-                        </Badge>
+                        {getAccountStatusBadges(user)}
+                      </TableCell>
+                      <TableCell className="text-center">
+                        <div className="flex items-center justify-center gap-2">
+                          {getExpiryIcon(user.credentialsExpiryDate)}
+                          <span className="text-xs">
+                            {formatExpiryDate(user.credentialsExpiryDate)}
+                          </span>
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-center">
+                        <div className="flex items-center justify-center gap-2">
+                          {getExpiryIcon(user.accountExpiryDate)}
+                          <span className="text-xs">
+                            {formatExpiryDate(user.accountExpiryDate)}
+                          </span>
+                        </div>
                       </TableCell>
                       <TableCell>
-                        <div className="flex items-center justify-center gap-2">
+                        <div className="flex items-center justify-center gap-1">
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => handleManageUser(user)}
+                                  className="text-blue-600 hover:text-blue-700"
+                                >
+                                  <Settings className="h-4 w-4" />
+                                </Button>
+                              </TooltipTrigger>
+                              <TooltipContent>Manage User</TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
+
                           <TooltipProvider>
                             <Tooltip>
                               <TooltipTrigger asChild>
@@ -459,14 +597,14 @@ function Admin() {
                                   onClick={() =>
                                     handleRoleToggle(
                                       user.userId,
-                                      user.role.roleName
+                                      user.role?.roleName || "ROLE_USER"
                                     )
                                   }
                                   disabled={
                                     adminCtx?.loading || isCurrentUser(user)
                                   }
                                 >
-                                  {user.role.roleName === "ROLE_ADMIN" ? (
+                                  {user.role?.roleName === "ROLE_ADMIN" ? (
                                     <Shield className="h-4 w-4 text-red-600" />
                                   ) : (
                                     <ShieldCheck className="h-4 w-4 text-blue-600" />
@@ -476,7 +614,7 @@ function Admin() {
                               <TooltipContent>
                                 {isCurrentUser(user)
                                   ? "Cannot modify own role"
-                                  : user.role.roleName === "ROLE_ADMIN"
+                                  : user.role?.roleName === "ROLE_ADMIN"
                                     ? "Remove Admin"
                                     : "Make Admin"}
                               </TooltipContent>
@@ -543,6 +681,13 @@ function Admin() {
         </Card>
       </div>
 
+      {/* Admin User Actions Dialog */}
+      <AdminUserActionsDialog
+        open={actionsDialogOpen}
+        onOpenChange={setActionsDialogOpen}
+        user={actionsUser}
+      />
+
       {/* User Details Modal - This could be expanded to a separate component */}
       {selectedUser && (
         <AlertDialog
@@ -574,18 +719,52 @@ function Admin() {
               </div>
               <div>
                 <p className="text-muted-foreground text-sm font-medium">
-                  Status
+                  Account Status
                 </p>
                 <div className="mt-1">
-                  <Badge
-                    variant={selectedUser.enabled ? "default" : "secondary"}
-                    className={
-                      selectedUser.enabled ? "bg-green-100 text-green-800" : ""
-                    }
-                  >
-                    {selectedUser.enabled ? "Active" : "Inactive"}
-                  </Badge>
+                  {getAccountStatusBadges(selectedUser)}
                 </div>
+              </div>
+              <div>
+                <p className="text-muted-foreground text-sm font-medium">
+                  Credentials Expiry Date
+                </p>
+                <div className="flex items-center gap-2 mt-1">
+                  {getExpiryIcon(selectedUser.credentialsExpiryDate)}
+                  <span className="text-sm">
+                    {formatExpiryDate(selectedUser.credentialsExpiryDate)}
+                  </span>
+                </div>
+              </div>
+              <div>
+                <p className="text-muted-foreground text-sm font-medium">
+                  Account Expiry Date
+                </p>
+                <div className="flex items-center gap-2 mt-1">
+                  {getExpiryIcon(selectedUser.accountExpiryDate)}
+                  <span className="text-sm">
+                    {formatExpiryDate(selectedUser.accountExpiryDate)}
+                  </span>
+                </div>
+              </div>
+              <div>
+                <p className="text-muted-foreground text-sm font-medium">
+                  Two-Factor Authentication
+                </p>
+                <div className="flex items-center gap-2 mt-1">
+                  {getStatusIcon(selectedUser.twoFactorEnabled, 'enabled')}
+                  <span className="text-sm">
+                    {selectedUser.twoFactorEnabled ? 'Enabled' : 'Disabled'}
+                  </span>
+                </div>
+              </div>
+              <div>
+                <p className="text-muted-foreground text-sm font-medium">
+                  Sign-Up Method
+                </p>
+                <p className="text-sm capitalize">
+                  {selectedUser.signUpMethod || 'Not specified'}
+                </p>
               </div>
               <div>
                 <p className="text-muted-foreground text-sm font-medium">
