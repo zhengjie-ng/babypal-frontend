@@ -7,13 +7,6 @@ import BabyContext from "@/context/BabyContext"
 function Home() {
   const babyCtx = useContext(BabyContext)
 
-  // Auto-select first baby if no baby is selected
-  useEffect(() => {
-    if (!babyCtx) return
-    if (babyCtx.babies?.length && !babyCtx.currentBaby) {
-      babyCtx.onBabySelect(babyCtx.babies[0].id)
-    }
-  }, [babyCtx])
 
   if (!babyCtx?.currentBaby) {
     return <EmptyBabyState />

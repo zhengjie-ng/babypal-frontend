@@ -66,13 +66,8 @@ export function BabyProvider({ children }: { children: ReactNode }) {
       const response = await api.get("/babies")
       setBabies(response.data)
 
-      // If there are babies and no baby is currently selected, select the first one
-      setCurrentBaby(prev => {
-        if (response.data.length > 0 && !prev) {
-          return response.data[0]
-        }
-        return prev
-      })
+      // Keep current baby selection unchanged
+      setCurrentBaby(prev => prev)
     } catch (error) {
       console.error("Error fetching babies:", error)
     } finally {

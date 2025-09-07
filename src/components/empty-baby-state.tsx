@@ -21,11 +21,17 @@ export function EmptyBabyState() {
             information.
           </AlertDescription>
         </Alert>
-        <Button asChild>
-          <Link to="#baby-selector" className="mt-2">
-            Select Baby
-          </Link>
-        </Button>
+        <div className="flex flex-wrap gap-2 mt-2">
+          {babyCtx.babies.map((baby) => (
+            <Button
+              key={baby.id}
+              onClick={() => babyCtx.onBabySelect(baby.id)}
+              variant="outline"
+            >
+              {baby.name}
+            </Button>
+          ))}
+        </div>
       </div>
     )
   }
