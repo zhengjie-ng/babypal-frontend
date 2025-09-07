@@ -13,6 +13,8 @@ import {
 import BabyContext from "@/context/BabyContext"
 import RecordContext from "@/context/RecordContext"
 import { format } from "date-fns"
+import { DialogRecordAdd } from "./dialog-record-add"
+import { RecordDialog } from "./dialog-record-details"
 import {
   Clock,
   Calendar,
@@ -37,6 +39,18 @@ interface TimelineItem {
   description: string
 }
 
+interface Record {
+  id: number
+  type: string
+  subType: string | null
+  startTime: string
+  endTime: string | null
+  note: string | null
+  author: string
+  createdAt: string
+  updatedAt: string
+}
+
 interface BabyContextType {
   currentBaby: {
     id: number
@@ -44,6 +58,7 @@ interface BabyContextType {
     records: Array<{
       id: number
       type: string
+      subType: string | null
       startTime: string
       note: string | null
     }>
@@ -162,6 +177,10 @@ export const CardTimeline = () => {
   }>({})
   const firstLoadRef = useRef(true)
 
+  // Dialog state management
+  const [selectedRecord, setSelectedRecord] = useState<Record | null>(null)
+  const [dialogOpen, setDialogOpen] = useState(false)
+
   // Get records from currentBaby - memoized to prevent unnecessary re-renders
   const records = useMemo(
     () => currentBaby?.records || [],
@@ -182,6 +201,21 @@ export const CardTimeline = () => {
       return
     }
 
+    // Helper function to capitalize first letter
+    const capitalizeFirstLetter = (str: string) => {
+      return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase()
+    }
+
+    // Helper function to format type and subtype display
+    const formatTypeDisplay = (type: string, subType: string | null) => {
+      const capitalizedType = capitalizeFirstLetter(type)
+      if (subType) {
+        const capitalizedSubType = capitalizeFirstLetter(subType)
+        return `${capitalizedType} - ${capitalizedSubType}`
+      }
+      return capitalizedType
+    }
+
     // Group records by date
     const groupedData = records.reduce(
       (
@@ -189,6 +223,7 @@ export const CardTimeline = () => {
         record: {
           id: number
           type: string
+          subType: string | null
           startTime: string
           note: string | null
         }
@@ -202,8 +237,8 @@ export const CardTimeline = () => {
         acc[date].push({
           id: record.id,
           type: "record",
-          time: format(new Date(record.startTime), "HH:mm"),
-          title: record.type,
+          time: format(new Date(record.startTime), "h:mm a"),
+          title: formatTypeDisplay(record.type, record.subType),
           description: record.note || "",
         })
 
@@ -223,6 +258,18 @@ export const CardTimeline = () => {
 
     setTimelineData(groupedData)
   }, [records, currentBaby])
+
+  // Handle double-click to edit record
+  const handleTimelineItemDoubleClick = (item: TimelineItem) => {
+    // Find the full record from currentBaby.records using the timeline item's id
+    const fullRecord = currentBaby?.records?.find(
+      (record) => record.id === item.id
+    ) as Record
+    if (fullRecord) {
+      setSelectedRecord(fullRecord)
+      setDialogOpen(true)
+    }
+  }
 
   if (!currentBaby) {
     return (
@@ -256,7 +303,8 @@ export const CardTimeline = () => {
               </p>
             </div>
           </div>
-          <div className="text-right">
+          <div className="flex items-center gap-3">
+            <DialogRecordAdd />
             <Badge variant="secondary" className="bg-white/80 backdrop-blur">
               <Calendar className="mr-1 h-3 w-3" />
               {Object.keys(timelineData).length} Days
@@ -314,7 +362,11 @@ export const CardTimeline = () => {
                           return (
                             <div
                               key={item.id}
-                              className={`group relative rounded-xl border p-4 transition-all duration-200 hover:scale-[1.02] hover:shadow-md ${typeInfo.bgColor} ${typeInfo.borderColor} bg-white/60 backdrop-blur-sm`}
+                              className={`group relative cursor-pointer rounded-xl border p-4 transition-all duration-200 hover:scale-[1.02] hover:shadow-md ${typeInfo.bgColor} ${typeInfo.borderColor} bg-white/60 backdrop-blur-sm`}
+                              onDoubleClick={() =>
+                                handleTimelineItemDoubleClick(item)
+                              }
+                              title="Double-click to edit"
                             >
                               {/* Timeline connector */}
                               {index < items.length - 1 && (
@@ -380,6 +432,13 @@ export const CardTimeline = () => {
           </Carousel>
         )}
       </CardContent>
+
+      {/* Record Details Dialog */}
+      <RecordDialog
+        record={selectedRecord}
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+      />
     </Card>
   )
 }

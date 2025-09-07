@@ -65,6 +65,8 @@ interface AuthContextType {
   loading: boolean
   setLoading: (loading: boolean) => void
   checkUserExists: (username: string) => Promise<boolean>
+  credentialExpiredUser: string | null
+  setCredentialExpiredUser: (username: string | null) => void
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -77,6 +79,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [token, setToken] = useState(storedToken || "")
   const [currentUser, setCurrentUser] = useState<User | null>(null)
   const [isAdmin, setIsAdmin] = useState<boolean>(storedIsAdmin)
+  const [credentialExpiredUser, setCredentialExpiredUser] = useState<string | null>(null)
 
   const navigate = useNavigate()
 
@@ -152,9 +155,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           "Login failed. Please check your credentials and try again."
         )
       }
-    } catch (error) {
+    } catch (error: any) {
       console.log(error)
-      toast.error("Invalid credentials")
+      
+      // Check if it's a credential expired error
+      if (error.response?.status === 401) {
+        const errorMessage = error.response?.data?.message || error.response?.data?.error || ""
+        
+        if (errorMessage.toLowerCase().includes("credential") && 
+            (errorMessage.toLowerCase().includes("expired") || errorMessage.toLowerCase().includes("expire"))) {
+          // Credentials are expired, show the dialog
+          setCredentialExpiredUser(data.username.toLowerCase())
+          toast.error("Your password has expired. Please reset it to continue.")
+          return
+        }
+      }
+      
+      // Handle other login errors
+      const errorMessage = error.response?.data?.message || "Invalid credentials"
+      toast.error(errorMessage)
     } finally {
       setLoading(false)
     }
@@ -177,7 +196,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           localStorage.removeItem("IS_ADMIN")
           setIsAdmin(false)
         }
-        setCurrentUser(data)
+        
+        // Transform the API response to match the User interface
+        const transformedUser: User = {
+          username: data.username || user.username,
+          email: data.email,
+          role: {
+            roleId: data.roles.includes("ROLE_ADMIN") ? 2 : 1,
+            roleName: data.roles.includes("ROLE_ADMIN") ? "ROLE_ADMIN" : "ROLE_USER"
+          }
+        }
+        
+        setCurrentUser(transformedUser)
       } catch (error) {
         console.error("Error fetching current user", error)
         toast.error("Error fetching current user")
@@ -280,6 +310,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     loading,
     setLoading,
     checkUserExists,
+    credentialExpiredUser,
+    setCredentialExpiredUser,
   }
 
   return (

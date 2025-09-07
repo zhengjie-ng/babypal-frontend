@@ -13,6 +13,7 @@ import { Loader2, Eye, EyeOff } from "lucide-react"
 import { Link } from "react-router-dom"
 import { useContext, useState } from "react"
 import AuthContext from "@/context/AuthContext"
+import { CredentialExpiredDialog } from "@/components/credential-expired-dialog"
 
 export function LoginForm({
   className,
@@ -37,6 +38,12 @@ export function LoginForm({
     e.preventDefault()
     if (authCtx?.onLoginHandler) {
       await authCtx.onLoginHandler(formData)
+    }
+  }
+
+  const handlePasswordReset = async (email: string) => {
+    if (authCtx?.onPasswordForgotHandler) {
+      await authCtx.onPasswordForgotHandler({ email })
     }
   }
 
@@ -142,6 +149,19 @@ export function LoginForm({
           </form>
         </CardContent>
       </Card>
+      
+      {/* Credential Expired Dialog */}
+      <CredentialExpiredDialog
+        open={!!authCtx?.credentialExpiredUser}
+        onOpenChange={(open) => {
+          if (!open && authCtx?.setCredentialExpiredUser) {
+            authCtx.setCredentialExpiredUser(null)
+          }
+        }}
+        username={authCtx?.credentialExpiredUser || ""}
+        onPasswordReset={handlePasswordReset}
+        loading={authCtx?.loading}
+      />
     </div>
   )
 }
