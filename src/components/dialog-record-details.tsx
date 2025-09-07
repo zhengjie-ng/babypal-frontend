@@ -349,7 +349,7 @@ export function RecordDialog({
               <Textarea
                 className="col-span-3"
                 disabled={!isEditing}
-                value={form.getValues("note") || ""}
+                value={form.watch("note") || ""}
                 onChange={(e) => form.setValue("note", e.target.value)}
               />
             </div>
