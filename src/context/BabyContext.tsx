@@ -61,6 +61,7 @@ export function BabyProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(false)
   const authCtx = useContext(AuthContext)
   const hasFetchedRef = useRef(false)
+  const updateRequestRef = useRef<number | null>(null)
 
   const fetchBabies = useCallback(async () => {
     try {
@@ -106,20 +107,31 @@ export function BabyProvider({ children }: { children: ReactNode }) {
     
     const selectedBaby = babies.find((baby) => baby.id === babyId)
     if (selectedBaby) {
+      // Cancel any pending update requests for the previous baby
+      updateRequestRef.current = null
       setCurrentBaby(selectedBaby)
+      // Set the new request tracking
+      updateRequestRef.current = babyId
     }
   }
 
   const updateCurrentBabyRecords = async () => {
     if (!currentBaby?.id) return
 
+    const requestId = currentBaby.id
+    updateRequestRef.current = requestId
+
     try {
-      const response = await api.get(`/babies/${currentBaby.id}`)
+      const response = await api.get(`/babies/${requestId}`)
       const updatedBaby = response.data
-      setCurrentBaby(updatedBaby)
-      setBabies(
-        babies.map((baby) => (baby.id === updatedBaby.id ? updatedBaby : baby))
-      )
+      
+      // Only update if this is still the latest request for the current baby
+      if (updateRequestRef.current === requestId && currentBaby?.id === requestId) {
+        setCurrentBaby(updatedBaby)
+        setBabies(
+          babies.map((baby) => (baby.id === updatedBaby.id ? updatedBaby : baby))
+        )
+      }
     } catch (error) {
       console.error("Error updating baby records:", error)
     }
