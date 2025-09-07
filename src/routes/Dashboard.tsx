@@ -3,12 +3,11 @@ import { TableRecord } from "@/components/table-record"
 import { Separator } from "@/components/ui/separator"
 import { DialogRecordAdd } from "@/components/dialog-record-add"
 import { EmptyBabyState } from "@/components/empty-baby-state"
-import { useContext, useEffect } from "react"
+import { useContext } from "react"
 import BabyContext from "@/context/BabyContext"
 
 function Dashboard() {
   const babyCtx = useContext(BabyContext)
-
 
   if (!babyCtx?.currentBaby) {
     return <EmptyBabyState />

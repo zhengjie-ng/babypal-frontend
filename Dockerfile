@@ -1,8 +1,6 @@
-FROM node:22-alpine
+FROM node:22-alpine AS build
 
 WORKDIR /app
-
-ENV PORT=5173
 
 COPY ["package.json", "package-lock.json*", "./"]
 
@@ -10,6 +8,12 @@ RUN npm install
 
 COPY . .
 
-EXPOSE 5173
+RUN npm run build
 
-CMD ["npm", "start"]
+FROM nginx:alpine AS production
+
+COPY --from=build /app/dist /usr/share/nginx/html
+
+EXPOSE 80
+
+CMD ["nginx", "-g", "daemon off;"]

@@ -2,12 +2,11 @@ import { Separator } from "@/components/ui/separator"
 import { TableMeasurement } from "@/components/table-measurement"
 import { DialogMeasurementAdd } from "@/components/dialog-measurement-add"
 import { EmptyBabyState } from "@/components/empty-baby-state"
-import { useContext, useEffect } from "react"
+import { useContext } from "react"
 import BabyContext from "@/context/BabyContext"
 
 function Measurements() {
   const babyCtx = useContext(BabyContext)
-
 
   if (!babyCtx?.currentBaby) {
     return <EmptyBabyState />

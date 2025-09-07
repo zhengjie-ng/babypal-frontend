@@ -1,12 +1,11 @@
 import { CardBabyProfile } from "@/components/card-baby-profile"
 import { CardTimeline } from "@/components/card-timeline"
 import { EmptyBabyState } from "@/components/empty-baby-state"
-import { useContext, useEffect } from "react"
+import { useContext } from "react"
 import BabyContext from "@/context/BabyContext"
 
 function Home() {
   const babyCtx = useContext(BabyContext)
-
 
   if (!babyCtx?.currentBaby) {
     return <EmptyBabyState />
