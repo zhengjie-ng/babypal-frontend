@@ -33,11 +33,52 @@ interface User {
   twoFactorEnabled: boolean
 }
 
+interface Record {
+  id: number
+  author: string
+  type: string
+  subType: string | null
+  note: string | null
+  startTime: string
+  endTime: string | null
+  createdAt: string
+  updatedAt: string
+}
+
+interface Measurement {
+  id: number
+  author: string
+  time: string
+  weight: number
+  height: number
+  headCircumference: number
+  createdAt: string
+  updatedAt: string
+}
+
+interface Baby {
+  id: number
+  name: string
+  gender: string | null
+  dateOfBirth: string
+  weight: number | null
+  height: number | null
+  headCircumference: number | null
+  caregivers: string[]
+  owner: string
+  createdAt: string
+  updatedAt: string
+  records: Record[]
+  measurements: Measurement[]
+}
+
 interface AdminContextType {
   users: User[]
+  babies: Baby[]
   loading: boolean
   error: string | null
   fetchUsers: () => Promise<void>
+  fetchBabies: () => Promise<void>
   getUserById: (userId: number) => Promise<User | null>
   updateUserStatus: (userId: number, enabled: boolean) => Promise<void>
   updateUserRole: (userId: number, roleName: string) => Promise<void>
@@ -49,6 +90,8 @@ interface AdminContextType {
   updateUserEmail: (userId: number, email: string) => Promise<void>
   updateAccountExpiryDate: (userId: number, expiryDate: string | null) => Promise<void>
   updateCredentialsExpiryDate: (userId: number, expiryDate: string | null) => Promise<void>
+  updateBaby: (babyId: number, babyData: Partial<Baby>) => Promise<void>
+  deleteBaby: (babyId: number) => Promise<void>
 }
 
 const AdminContext = createContext<AdminContextType | null>(null)
@@ -68,6 +111,7 @@ const normalizeExpiryDate = (date: string | null): string | null => {
 
 export function AdminProvider({ children }: { children: ReactNode }) {
   const [users, setUsers] = useState<User[]>([])
+  const [babies, setBabies] = useState<Baby[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const authCtx = useContext(AuthContext)
@@ -141,6 +185,42 @@ export function AdminProvider({ children }: { children: ReactNode }) {
           ? err.message
           : (err as { response?: { data?: { message?: string } } })?.response
               ?.data?.message || "Error fetching users"
+      setError(errorMessage)
+      toast.error(errorMessage)
+    } finally {
+      setLoading(false)
+    }
+  }, [])
+
+  const fetchBabies = useCallback(async () => {
+    try {
+      setLoading(true)
+      setError(null)
+
+      const token = localStorage.getItem("JWT_TOKEN")
+      const isAdmin = localStorage.getItem("IS_ADMIN")
+
+      if (!token) {
+        throw new Error("No authentication token found")
+      }
+
+      if (isAdmin !== "true") {
+        throw new Error("User does not have admin privileges")
+      }
+
+      const response = await api.get("/admin/get-babies")
+      const babiesData = Array.isArray(response.data) ? response.data : []
+      
+      // Sort babies by id
+      const sortedBabies = babiesData.sort((a, b) => a.id - b.id)
+      setBabies(sortedBabies)
+    } catch (err) {
+      console.error("Admin babies fetch error:", err)
+      const errorMessage =
+        err instanceof Error
+          ? err.message
+          : (err as { response?: { data?: { message?: string } } })?.response
+              ?.data?.message || "Error fetching babies"
       setError(errorMessage)
       toast.error(errorMessage)
     } finally {
@@ -426,6 +506,53 @@ export function AdminProvider({ children }: { children: ReactNode }) {
     []
   )
 
+  const updateBaby = useCallback(
+    async (babyId: number, babyData: Partial<Baby>) => {
+      try {
+        await api.put(`/babies/${babyId}`, babyData)
+        
+        // Update local state
+        setBabies((prevBabies) =>
+          prevBabies.map((baby) =>
+            baby.id === babyId ? { ...baby, ...babyData } : baby
+          ).sort((a, b) => a.id - b.id)
+        )
+        
+        toast.success("Baby updated successfully")
+      } catch (err) {
+        const errorMessage =
+          err instanceof Error
+            ? err.message
+            : (err as { response?: { data?: { message?: string } } })?.response
+                ?.data?.message || "Error updating baby"
+        toast.error(errorMessage)
+        throw err
+      }
+    },
+    []
+  )
+
+  const deleteBaby = useCallback(async (babyId: number) => {
+    try {
+      await api.delete(`/babies/${babyId}`)
+
+      // Remove from local state
+      setBabies((prevBabies) =>
+        prevBabies.filter((baby) => baby.id !== babyId).sort((a, b) => a.id - b.id)
+      )
+
+      toast.success("Baby deleted successfully")
+    } catch (err) {
+      const errorMessage =
+        err instanceof Error
+          ? err.message
+          : (err as { response?: { data?: { message?: string } } })?.response
+              ?.data?.message || "Error deleting baby"
+      toast.error(errorMessage)
+      throw err
+    }
+  }, [])
+
   // Fetch users when component mounts and user is admin
   useEffect(() => {
     if (authCtx?.isAdmin && authCtx?.token && !loading) {
@@ -435,9 +562,11 @@ export function AdminProvider({ children }: { children: ReactNode }) {
 
   const contextValue: AdminContextType = {
     users,
+    babies,
     loading,
     error,
     fetchUsers,
+    fetchBabies,
     getUserById,
     updateUserStatus,
     updateUserRole,
@@ -449,6 +578,8 @@ export function AdminProvider({ children }: { children: ReactNode }) {
     updateUserEmail,
     updateAccountExpiryDate,
     updateCredentialsExpiryDate,
+    updateBaby,
+    deleteBaby,
   }
 
   return (

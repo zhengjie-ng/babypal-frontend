@@ -196,7 +196,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           localStorage.removeItem("IS_ADMIN")
           setIsAdmin(false)
         }
-        setCurrentUser(data)
+        
+        // Transform the API response to match the User interface
+        const transformedUser: User = {
+          username: data.username || user.username,
+          email: data.email,
+          role: {
+            roleId: data.roles.includes("ROLE_ADMIN") ? 2 : 1,
+            roleName: data.roles.includes("ROLE_ADMIN") ? "ROLE_ADMIN" : "ROLE_USER"
+          }
+        }
+        
+        setCurrentUser(transformedUser)
       } catch (error) {
         console.error("Error fetching current user", error)
         toast.error("Error fetching current user")

@@ -36,6 +36,7 @@ import {
   XCircle,
   AlertTriangle,
   Settings,
+  Baby,
 } from "lucide-react"
 import AdminContext from "@/context/AdminContext"
 import AuthContext from "@/context/AuthContext"
@@ -59,6 +60,7 @@ import {
 } from "@/components/ui/tooltip"
 import { AdminDebug } from "@/components/admin-debug"
 import { AdminUserActionsDialog } from "@/components/admin-user-actions-dialog"
+import { AdminBabiesList } from "@/components/admin-babies-list"
 
 interface Role {
   roleId: number
@@ -100,6 +102,7 @@ function Admin() {
   const [sortDirection, setSortDirection] = useState<SortDirection>("asc")
   const [actionsDialogOpen, setActionsDialogOpen] = useState(false)
   const [actionsUser, setActionsUser] = useState<User | null>(null)
+  const [activeTab, setActiveTab] = useState<"users" | "babies">("users")
 
   // Helper function to check if user is the currently signed-in user
   const isCurrentUser = (user: User) => {
@@ -182,6 +185,17 @@ function Admin() {
   const handleManageUser = (user: User) => {
     setActionsUser(user)
     setActionsDialogOpen(true)
+  }
+
+  const handleTabChange = (tab: "users" | "babies") => {
+    setActiveTab(tab)
+    
+    // Auto-fetch data when switching tabs
+    if (tab === "babies" && adminCtx?.babies.length === 0) {
+      adminCtx.fetchBabies()
+    } else if (tab === "users" && adminCtx?.users.length === 0) {
+      adminCtx.fetchUsers()
+    }
   }
 
 
@@ -330,355 +344,342 @@ function Admin() {
           <div>
             <h1 className="text-3xl font-bold tracking-tight">Admin Panel</h1>
             <p className="text-muted-foreground">
-              Manage users and system administration
+              Manage users, babies, and system administration
             </p>
           </div>
-          <Button
-            onClick={adminCtx?.fetchUsers}
-            disabled={adminCtx?.loading}
-            variant="outline"
-          >
-            {adminCtx?.loading ? (
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            ) : null}
-            Refresh
-          </Button>
+          <div className="flex items-center gap-2">
+            {/* Tab Switcher */}
+            <div className="flex items-center space-x-2">
+              <Button
+                variant={activeTab === "users" ? "default" : "outline"}
+                size="sm"
+                onClick={() => handleTabChange("users")}
+              >
+                <Users className="mr-2 h-4 w-4" />
+                Users
+              </Button>
+              <Button
+                variant={activeTab === "babies" ? "default" : "outline"}
+                size="sm"
+                onClick={() => handleTabChange("babies")}
+              >
+                <Baby className="mr-2 h-4 w-4" />
+                Babies
+              </Button>
+            </div>
+            
+            {/* Refresh Button */}
+            <Button
+              onClick={() => {
+                if (activeTab === "users") {
+                  adminCtx?.fetchUsers()
+                } else {
+                  adminCtx?.fetchBabies()
+                }
+              }}
+              disabled={adminCtx?.loading}
+              variant="outline"
+            >
+              {adminCtx?.loading ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : null}
+              Refresh
+            </Button>
+          </div>
         </div>
 
-        {/* Stats Card */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Users className="h-5 w-5" />
-              User Statistics
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-              <div className="text-center">
-                <p className="text-2xl font-bold">
-                  {adminCtx?.users.length || 0}
-                </p>
-                <p className="text-muted-foreground text-sm">Total Users</p>
-              </div>
-              <div className="text-center">
-                <p className="text-2xl font-bold text-green-600">
-                  {adminCtx?.users.filter((user) => user.enabled).length || 0}
-                </p>
-                <p className="text-muted-foreground text-sm">Active Users</p>
-              </div>
-              <div className="text-center">
-                <p className="text-2xl font-bold text-red-600">
-                  {adminCtx?.users.filter((user) => !user.enabled).length || 0}
-                </p>
-                <p className="text-muted-foreground text-sm">Inactive Users</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+        {/* Content based on active tab */}
+        {activeTab === "users" ? (
+          <>
+            {/* User Stats Card */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Users className="h-5 w-5" />
+                  User Statistics
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+                  <div className="text-center">
+                    <p className="text-2xl font-bold">
+                      {adminCtx?.users.length || 0}
+                    </p>
+                    <p className="text-muted-foreground text-sm">Total Users</p>
+                  </div>
+                  <div className="text-center">
+                    <p className="text-2xl font-bold text-green-600">
+                      {adminCtx?.users.filter((user) => user.enabled).length || 0}
+                    </p>
+                    <p className="text-muted-foreground text-sm">Active Users</p>
+                  </div>
+                  <div className="text-center">
+                    <p className="text-2xl font-bold text-red-600">
+                      {adminCtx?.users.filter((user) => !user.enabled).length || 0}
+                    </p>
+                    <p className="text-muted-foreground text-sm">Inactive Users</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
 
-        {/* Users Table */}
-        <Card>
-          <CardHeader>
-            <CardTitle>All Users</CardTitle>
-            <CardDescription>
-              View and manage all registered users in the system
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            {adminCtx?.loading ? (
-              <div className="flex h-64 flex-col items-center justify-center">
-                <Loader2 className="mb-2 h-8 w-8 animate-spin" />
-                <p className="text-muted-foreground">Loading users...</p>
-              </div>
-            ) : adminCtx?.users.length === 0 ? (
-              <div className="py-8 text-center">
-                <Users className="text-muted-foreground mx-auto mb-4 h-12 w-12" />
-                <p className="text-muted-foreground">No users found</p>
-              </div>
-            ) : (
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="h-auto p-0 font-semibold"
-                        onClick={() => handleSort("userId")}
-                      >
-                        ID
-                        {getSortIcon("userId")}
-                      </Button>
-                    </TableHead>
-                    <TableHead>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="h-auto p-0 font-semibold"
-                        onClick={() => handleSort("userName")}
-                      >
-                        Username
-                        {getSortIcon("userName")}
-                      </Button>
-                    </TableHead>
-                    <TableHead>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="h-auto p-0 font-semibold"
-                        onClick={() => handleSort("email")}
-                      >
-                        Email
-                        {getSortIcon("email")}
-                      </Button>
-                    </TableHead>
-                    <TableHead>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="h-auto p-0 font-semibold"
-                        onClick={() => handleSort("role")}
-                      >
-                        Role
-                        {getSortIcon("role")}
-                      </Button>
-                    </TableHead>
-                    <TableHead>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="h-auto p-0 font-semibold"
-                        onClick={() => handleSort("createdDate")}
-                      >
-                        Created Date
-                        {getSortIcon("createdDate")}
-                      </Button>
-                    </TableHead>
-                    <TableHead>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="h-auto p-0 font-semibold"
-                        onClick={() => handleSort("enabled")}
-                      >
-                        Account Status
-                        {getSortIcon("enabled")}
-                      </Button>
-                    </TableHead>
-                    <TableHead className="text-center">
-                      <div className="flex items-center gap-1 justify-center">
-                        <Clock className="h-4 w-4" />
-                        Credentials Expiry
-                      </div>
-                    </TableHead>
-                    <TableHead className="text-center">
-                      <div className="flex items-center gap-1 justify-center">
-                        <Calendar className="h-4 w-4" />
-                        Account Expiry
-                      </div>
-                    </TableHead>
-                    <TableHead className="text-center">Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {sortedUsers.map((user) => (
-                    <TableRow key={user.userId}>
-                      <TableCell className="text-muted-foreground font-mono text-sm">
-                        {user.userId}
-                      </TableCell>
-                      <TableCell className="font-medium">
-                        {user.userName}
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center gap-2">
-                          <Mail className="text-muted-foreground h-4 w-4" />
-                          {user.email}
-                        </div>
-                      </TableCell>
-                      <TableCell>{getUserRoleBadge(user)}</TableCell>
-                      <TableCell>
-                        <div className="flex items-center gap-2">
-                          <Calendar className="text-muted-foreground h-4 w-4" />
-                          {formatDate(user.createdDate)}
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        {getAccountStatusBadges(user)}
-                      </TableCell>
-                      <TableCell className="text-center">
-                        <div className="flex items-center justify-center gap-2">
-                          {getExpiryIcon(user.credentialsExpiryDate)}
-                          <span className="text-xs">
-                            {formatExpiryDate(user.credentialsExpiryDate)}
-                          </span>
-                        </div>
-                      </TableCell>
-                      <TableCell className="text-center">
-                        <div className="flex items-center justify-center gap-2">
-                          {getExpiryIcon(user.accountExpiryDate)}
-                          <span className="text-xs">
-                            {formatExpiryDate(user.accountExpiryDate)}
-                          </span>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center justify-center gap-1">
-                          <TooltipProvider>
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  onClick={() => handleManageUser(user)}
-                                  className="text-blue-600 hover:text-blue-700"
-                                >
-                                  <Settings className="h-4 w-4" />
-                                </Button>
-                              </TooltipTrigger>
-                              <TooltipContent>Manage User</TooltipContent>
-                            </Tooltip>
-                          </TooltipProvider>
-
-                          <TooltipProvider>
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  onClick={() => setSelectedUser(user)}
-                                >
-                                  <Eye className="h-4 w-4" />
-                                </Button>
-                              </TooltipTrigger>
-                              <TooltipContent>View Details</TooltipContent>
-                            </Tooltip>
-                          </TooltipProvider>
-
-                          <TooltipProvider>
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  onClick={() =>
-                                    handleStatusToggle(
-                                      user.userId,
-                                      user.enabled
-                                    )
-                                  }
-                                  disabled={
-                                    adminCtx?.loading || isCurrentUser(user)
-                                  }
-                                >
-                                  {user.enabled ? (
-                                    <UserX className="h-4 w-4 text-orange-600" />
-                                  ) : (
-                                    <UserCheck className="h-4 w-4 text-green-600" />
-                                  )}
-                                </Button>
-                              </TooltipTrigger>
-                              <TooltipContent>
-                                {isCurrentUser(user)
-                                  ? "Cannot modify own status"
-                                  : user.enabled
-                                    ? "Disable User"
-                                    : "Enable User"}
-                              </TooltipContent>
-                            </Tooltip>
-                          </TooltipProvider>
-
-                          <TooltipProvider>
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  onClick={() =>
-                                    handleRoleToggle(
-                                      user.userId,
-                                      user.role?.roleName || "ROLE_USER"
-                                    )
-                                  }
-                                  disabled={
-                                    adminCtx?.loading || isCurrentUser(user)
-                                  }
-                                >
-                                  {user.role?.roleName === "ROLE_ADMIN" ? (
-                                    <Shield className="h-4 w-4 text-red-600" />
-                                  ) : (
-                                    <ShieldCheck className="h-4 w-4 text-blue-600" />
-                                  )}
-                                </Button>
-                              </TooltipTrigger>
-                              <TooltipContent>
-                                {isCurrentUser(user)
-                                  ? "Cannot modify own role"
-                                  : user.role?.roleName === "ROLE_ADMIN"
-                                    ? "Remove Admin"
-                                    : "Make Admin"}
-                              </TooltipContent>
-                            </Tooltip>
-                          </TooltipProvider>
-
-                          {/* <TooltipProvider>
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <AlertDialog>
-                                  <AlertDialogTrigger asChild>
+            {/* Users Table */}
+            <Card>
+              <CardHeader>
+                <CardTitle>All Users</CardTitle>
+                <CardDescription>
+                  View and manage all registered users in the system
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {adminCtx?.loading ? (
+                  <div className="flex h-64 flex-col items-center justify-center">
+                    <Loader2 className="mb-2 h-8 w-8 animate-spin" />
+                    <p className="text-muted-foreground">Loading users...</p>
+                  </div>
+                ) : adminCtx?.users.length === 0 ? (
+                  <div className="py-8 text-center">
+                    <Users className="text-muted-foreground mx-auto mb-4 h-12 w-12" />
+                    <p className="text-muted-foreground">No users found</p>
+                  </div>
+                ) : (
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-auto p-0 font-semibold"
+                            onClick={() => handleSort("userId")}
+                          >
+                            ID
+                            {getSortIcon("userId")}
+                          </Button>
+                        </TableHead>
+                        <TableHead>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-auto p-0 font-semibold"
+                            onClick={() => handleSort("userName")}
+                          >
+                            Username
+                            {getSortIcon("userName")}
+                          </Button>
+                        </TableHead>
+                        <TableHead>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-auto p-0 font-semibold"
+                            onClick={() => handleSort("email")}
+                          >
+                            Email
+                            {getSortIcon("email")}
+                          </Button>
+                        </TableHead>
+                        <TableHead>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-auto p-0 font-semibold"
+                            onClick={() => handleSort("role")}
+                          >
+                            Role
+                            {getSortIcon("role")}
+                          </Button>
+                        </TableHead>
+                        <TableHead>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-auto p-0 font-semibold"
+                            onClick={() => handleSort("createdDate")}
+                          >
+                            Created Date
+                            {getSortIcon("createdDate")}
+                          </Button>
+                        </TableHead>
+                        <TableHead>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-auto p-0 font-semibold"
+                            onClick={() => handleSort("enabled")}
+                          >
+                            Account Status
+                            {getSortIcon("enabled")}
+                          </Button>
+                        </TableHead>
+                        <TableHead className="text-center">
+                          <div className="flex items-center gap-1 justify-center">
+                            <Clock className="h-4 w-4" />
+                            Credentials Expiry
+                          </div>
+                        </TableHead>
+                        <TableHead className="text-center">
+                          <div className="flex items-center gap-1 justify-center">
+                            <Calendar className="h-4 w-4" />
+                            Account Expiry
+                          </div>
+                        </TableHead>
+                        <TableHead className="text-center">Actions</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {sortedUsers.map((user) => (
+                        <TableRow key={user.userId}>
+                          <TableCell className="text-muted-foreground font-mono text-sm">
+                            {user.userId}
+                          </TableCell>
+                          <TableCell className="font-medium">
+                            {user.userName}
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex items-center gap-2">
+                              <Mail className="text-muted-foreground h-4 w-4" />
+                              {user.email}
+                            </div>
+                          </TableCell>
+                          <TableCell>{getUserRoleBadge(user)}</TableCell>
+                          <TableCell>
+                            <div className="flex items-center gap-2">
+                              <Calendar className="text-muted-foreground h-4 w-4" />
+                              {formatDate(user.createdDate)}
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            {getAccountStatusBadges(user)}
+                          </TableCell>
+                          <TableCell className="text-center">
+                            <div className="flex items-center justify-center gap-2">
+                              {getExpiryIcon(user.credentialsExpiryDate)}
+                              <span className="text-xs">
+                                {formatExpiryDate(user.credentialsExpiryDate)}
+                              </span>
+                            </div>
+                          </TableCell>
+                          <TableCell className="text-center">
+                            <div className="flex items-center justify-center gap-2">
+                              {getExpiryIcon(user.accountExpiryDate)}
+                              <span className="text-xs">
+                                {formatExpiryDate(user.accountExpiryDate)}
+                              </span>
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex items-center justify-center gap-1">
+                              <TooltipProvider>
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
                                     <Button
                                       variant="ghost"
                                       size="sm"
-                                      className="text-destructive hover:text-destructive"
-                                      disabled={isCurrentUser(user)}
+                                      onClick={() => handleManageUser(user)}
+                                      className="text-blue-600 hover:text-blue-700"
                                     >
-                                      <Trash2 className="h-4 w-4" />
+                                      <Settings className="h-4 w-4" />
                                     </Button>
-                                  </AlertDialogTrigger>
-                                  <AlertDialogContent>
-                                    <AlertDialogHeader>
-                                      <AlertDialogTitle>
-                                        Delete User
-                                      </AlertDialogTitle>
-                                      <AlertDialogDescription>
-                                        Are you sure you want to delete user "
-                                        {user.userName}"? This action cannot be
-                                        undone and will permanently remove all
-                                        user data.
-                                      </AlertDialogDescription>
-                                    </AlertDialogHeader>
-                                    <AlertDialogFooter>
-                                      <AlertDialogCancel>
-                                        Cancel
-                                      </AlertDialogCancel>
-                                      <AlertDialogAction
-                                        onClick={() =>
-                                          handleDeleteUser(user.userId)
-                                        }
-                                        className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                                      >
-                                        Delete
-                                      </AlertDialogAction>
-                                    </AlertDialogFooter>
-                                  </AlertDialogContent>
-                                </AlertDialog>
-                              </TooltipTrigger>
-                              <TooltipContent>
-                                {isCurrentUser(user)
-                                  ? "Cannot delete own account"
-                                  : "Delete User"}
-                              </TooltipContent>
-                            </Tooltip>
-                          </TooltipProvider> */}
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            )}
-          </CardContent>
-        </Card>
+                                  </TooltipTrigger>
+                                  <TooltipContent>Manage User</TooltipContent>
+                                </Tooltip>
+                              </TooltipProvider>
+
+                              <TooltipProvider>
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      onClick={() => setSelectedUser(user)}
+                                    >
+                                      <Eye className="h-4 w-4" />
+                                    </Button>
+                                  </TooltipTrigger>
+                                  <TooltipContent>View Details</TooltipContent>
+                                </Tooltip>
+                              </TooltipProvider>
+
+                              <TooltipProvider>
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      onClick={() =>
+                                        handleStatusToggle(
+                                          user.userId,
+                                          user.enabled
+                                        )
+                                      }
+                                      disabled={
+                                        adminCtx?.loading || isCurrentUser(user)
+                                      }
+                                    >
+                                      {user.enabled ? (
+                                        <UserX className="h-4 w-4 text-orange-600" />
+                                      ) : (
+                                        <UserCheck className="h-4 w-4 text-green-600" />
+                                      )}
+                                    </Button>
+                                  </TooltipTrigger>
+                                  <TooltipContent>
+                                    {isCurrentUser(user)
+                                      ? "Cannot modify own status"
+                                      : user.enabled
+                                        ? "Disable User"
+                                        : "Enable User"}
+                                  </TooltipContent>
+                                </Tooltip>
+                              </TooltipProvider>
+
+                              <TooltipProvider>
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      onClick={() =>
+                                        handleRoleToggle(
+                                          user.userId,
+                                          user.role?.roleName || "ROLE_USER"
+                                        )
+                                      }
+                                      disabled={
+                                        adminCtx?.loading || isCurrentUser(user)
+                                      }
+                                    >
+                                      {user.role?.roleName === "ROLE_ADMIN" ? (
+                                        <Shield className="h-4 w-4 text-red-600" />
+                                      ) : (
+                                        <ShieldCheck className="h-4 w-4 text-blue-600" />
+                                      )}
+                                    </Button>
+                                  </TooltipTrigger>
+                                  <TooltipContent>
+                                    {isCurrentUser(user)
+                                      ? "Cannot modify own role"
+                                      : user.role?.roleName === "ROLE_ADMIN"
+                                        ? "Remove Admin"
+                                        : "Make Admin"}
+                                  </TooltipContent>
+                                </Tooltip>
+                              </TooltipProvider>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                )}
+              </CardContent>
+            </Card>
+          </>
+        ) : (
+          /* Babies Tab Content */
+          <AdminBabiesList />
+        )}
       </div>
 
       {/* Admin User Actions Dialog */}
