@@ -1,5 +1,5 @@
 import { AlertCircle } from "lucide-react"
-import { Link } from "react-router-dom"
+// import { Link } from "react-router-dom"
 import { Button } from "@/components/ui/button"
 import { DialogBabyAdd } from "@/components/dialog-baby-add"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
@@ -21,7 +21,7 @@ export function EmptyBabyState() {
             information.
           </AlertDescription>
         </Alert>
-        <div className="flex flex-wrap gap-2 mt-2">
+        <div className="mt-2 flex flex-wrap gap-2">
           {babyCtx.babies.map((baby) => (
             <Button
               key={baby.id}
