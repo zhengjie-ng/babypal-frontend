@@ -5,6 +5,7 @@ import {
   useEffect,
   useCallback,
   useContext,
+  useRef,
   type ReactNode,
 } from "react"
 import AuthContext from "./AuthContext"
@@ -59,6 +60,7 @@ export function BabyProvider({ children }: { children: ReactNode }) {
   const [currentBaby, setCurrentBaby] = useState<Baby | null>(null)
   const [loading, setLoading] = useState(false)
   const authCtx = useContext(AuthContext)
+  const hasFetchedRef = useRef(false)
 
   const fetchBabies = useCallback(async () => {
     try {
@@ -66,8 +68,12 @@ export function BabyProvider({ children }: { children: ReactNode }) {
       const response = await api.get("/babies")
       setBabies(response.data)
 
-      // Keep current baby selection unchanged
-      setCurrentBaby(prev => prev)
+      // Preserve current baby selection by finding it in the new babies array
+      setCurrentBaby(prev => {
+        if (!prev) return null
+        const foundBaby = response.data.find((baby: Baby) => baby.id === prev.id)
+        return foundBaby || null
+      })
     } catch (error) {
       console.error("Error fetching babies:", error)
     } finally {
@@ -78,20 +84,30 @@ export function BabyProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     // Only fetch babies if we have a token
     if (authCtx?.token) {
-      fetchBabies()
+      // Only fetch if we haven't fetched yet or if we're switching users
+      if (!hasFetchedRef.current || babies.length === 0) {
+        fetchBabies()
+        hasFetchedRef.current = true
+      }
     } else {
       // Clear babies and current baby if there's no token
       setBabies([])
       setCurrentBaby(null)
+      hasFetchedRef.current = false
     }
-  }, [authCtx?.token, fetchBabies])
+  }, [authCtx?.token, fetchBabies, babies.length])
 
   const onBabySelect = (babyId: number) => {
     // Prevent switching while loading to avoid race conditions
     if (loading) return
     
+    // Don't select if already selected
+    if (currentBaby?.id === babyId) return
+    
     const selectedBaby = babies.find((baby) => baby.id === babyId)
-    setCurrentBaby(selectedBaby || null)
+    if (selectedBaby) {
+      setCurrentBaby(selectedBaby)
+    }
   }
 
   const updateCurrentBabyRecords = async () => {
