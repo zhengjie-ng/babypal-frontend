@@ -95,8 +95,30 @@ export function AdminUserActionsDialog({
   useEffect(() => {
     if (user) {
       setNewEmail(user.email)
-      setAccountExpiryDate(user.accountExpiryDate ? new Date(user.accountExpiryDate) : undefined)
-      setCredentialsExpiryDate(user.credentialsExpiryDate ? new Date(user.credentialsExpiryDate) : undefined)
+      
+      // Safely parse account expiry date
+      if (user.accountExpiryDate) {
+        try {
+          const accountDate = new Date(user.accountExpiryDate)
+          setAccountExpiryDate(isNaN(accountDate.getTime()) ? undefined : accountDate)
+        } catch {
+          setAccountExpiryDate(undefined)
+        }
+      } else {
+        setAccountExpiryDate(undefined)
+      }
+      
+      // Safely parse credentials expiry date
+      if (user.credentialsExpiryDate) {
+        try {
+          const credentialsDate = new Date(user.credentialsExpiryDate)
+          setCredentialsExpiryDate(isNaN(credentialsDate.getTime()) ? undefined : credentialsDate)
+        } catch {
+          setCredentialsExpiryDate(undefined)
+        }
+      } else {
+        setCredentialsExpiryDate(undefined)
+      }
     }
   }, [user])
 
