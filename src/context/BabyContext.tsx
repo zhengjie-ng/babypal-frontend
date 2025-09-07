@@ -5,6 +5,7 @@ import {
   useEffect,
   useCallback,
   useContext,
+  useRef,
   type ReactNode,
 } from "react"
 import AuthContext from "./AuthContext"
@@ -59,6 +60,8 @@ export function BabyProvider({ children }: { children: ReactNode }) {
   const [currentBaby, setCurrentBaby] = useState<Baby | null>(null)
   const [loading, setLoading] = useState(false)
   const authCtx = useContext(AuthContext)
+  const hasFetchedRef = useRef(false)
+  const updateRequestRef = useRef<number | null>(null)
 
   const fetchBabies = useCallback(async () => {
     try {
@@ -66,12 +69,11 @@ export function BabyProvider({ children }: { children: ReactNode }) {
       const response = await api.get("/babies")
       setBabies(response.data)
 
-      // If there are babies and no baby is currently selected, select the first one
+      // Preserve current baby selection by finding it in the new babies array
       setCurrentBaby(prev => {
-        if (response.data.length > 0 && !prev) {
-          return response.data[0]
-        }
-        return prev
+        if (!prev) return null
+        const foundBaby = response.data.find((baby: Baby) => baby.id === prev.id)
+        return foundBaby || null
       })
     } catch (error) {
       console.error("Error fetching babies:", error)
@@ -83,32 +85,53 @@ export function BabyProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     // Only fetch babies if we have a token
     if (authCtx?.token) {
-      fetchBabies()
+      // Only fetch if we haven't fetched yet or if we're switching users
+      if (!hasFetchedRef.current || babies.length === 0) {
+        fetchBabies()
+        hasFetchedRef.current = true
+      }
     } else {
       // Clear babies and current baby if there's no token
       setBabies([])
       setCurrentBaby(null)
+      hasFetchedRef.current = false
     }
-  }, [authCtx?.token, fetchBabies])
+  }, [authCtx?.token, fetchBabies, babies.length])
 
   const onBabySelect = (babyId: number) => {
     // Prevent switching while loading to avoid race conditions
     if (loading) return
     
+    // Don't select if already selected
+    if (currentBaby?.id === babyId) return
+    
     const selectedBaby = babies.find((baby) => baby.id === babyId)
-    setCurrentBaby(selectedBaby || null)
+    if (selectedBaby) {
+      // Cancel any pending update requests for the previous baby
+      updateRequestRef.current = null
+      setCurrentBaby(selectedBaby)
+      // Set the new request tracking
+      updateRequestRef.current = babyId
+    }
   }
 
   const updateCurrentBabyRecords = async () => {
     if (!currentBaby?.id) return
 
+    const requestId = currentBaby.id
+    updateRequestRef.current = requestId
+
     try {
-      const response = await api.get(`/babies/${currentBaby.id}`)
+      const response = await api.get(`/babies/${requestId}`)
       const updatedBaby = response.data
-      setCurrentBaby(updatedBaby)
-      setBabies(
-        babies.map((baby) => (baby.id === updatedBaby.id ? updatedBaby : baby))
-      )
+      
+      // Only update if this is still the latest request for the current baby
+      if (updateRequestRef.current === requestId && currentBaby?.id === requestId) {
+        setCurrentBaby(updatedBaby)
+        setBabies(
+          babies.map((baby) => (baby.id === updatedBaby.id ? updatedBaby : baby))
+        )
+      }
     } catch (error) {
       console.error("Error updating baby records:", error)
     }
