@@ -31,6 +31,10 @@ export function AdminDebug() {
     adminLoading: adminCtx?.loading,
     adminError: adminCtx?.error,
     usersCount: adminCtx?.users?.length || 0,
+
+    // Environment Variables
+    viteClientUrl: import.meta.env.VITE_CLIENT_URL,
+    viteApiUrl: import.meta.env.VITE_API_URL,
   }
 
   return (
@@ -105,6 +109,20 @@ export function AdminDebug() {
             <div>
               <span className="text-muted-foreground">Users Loaded:</span>
               <span className="ml-2">{debugInfo.usersCount}</span>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <h4 className="font-semibold mb-2">Environment Variables</h4>
+          <div className="text-sm space-y-1">
+            <div>
+              <span className="text-muted-foreground">VITE_CLIENT_URL:</span>
+              <span className="ml-2 font-mono">{debugInfo.viteClientUrl || "Not set"}</span>
+            </div>
+            <div>
+              <span className="text-muted-foreground">VITE_API_URL:</span>
+              <span className="ml-2 font-mono">{debugInfo.viteApiUrl || "Not set"}</span>
             </div>
           </div>
         </div>
