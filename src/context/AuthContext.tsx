@@ -208,6 +208,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
         
         setCurrentUser(transformedUser)
+        // Update localStorage with fresh user data
+        localStorage.setItem("USER", JSON.stringify(transformedUser))
       } catch (error) {
         console.error("Error fetching current user", error)
         toast.error("Error fetching current user")
