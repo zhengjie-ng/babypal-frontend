@@ -1,7 +1,7 @@
 import { ImBin } from "react-icons/im"
 import { TbMoodKid } from "react-icons/tb"
 import { Button } from "@/components/ui/button"
-import { formatDate, calculateAge } from "@/lib/utils"
+import { formatDate, calculateAge, cn } from "@/lib/utils"
 import {
   Card,
   CardContent,
@@ -20,6 +20,30 @@ export function CardBabyProfile() {
   const babyCtx = useContext(BabyContext)
   const authCtx = useContext(AuthContext)
 
+  // Get gender-based colors
+  const getGenderColors = () => {
+    const gender = babyCtx?.currentBaby?.gender?.toLowerCase()
+    
+    if (gender === 'male') {
+      return {
+        bgColor: 'bg-blue-100 dark:bg-blue-950/30',
+        iconColor: 'text-blue-600 dark:text-blue-400'
+      }
+    } else if (gender === 'female') {
+      return {
+        bgColor: 'bg-pink-100 dark:bg-pink-950/30',
+        iconColor: 'text-pink-600 dark:text-pink-400'
+      }
+    } else {
+      return {
+        bgColor: 'bg-primary/10',
+        iconColor: 'text-primary'
+      }
+    }
+  }
+
+  const { bgColor, iconColor } = getGenderColors()
+
   const handleDelete = async () => {
     if (!babyCtx?.currentBaby) return
 
@@ -36,12 +60,12 @@ export function CardBabyProfile() {
   }
 
   return (
-    <Card className="h-150 w-220 max-w-md">
+    <Card className="w-full">
       <CardHeader className="text-center">
-        <div className="bg-primary/10 mx-auto mb-4 rounded-full p-4">
-          <TbMoodKid className="text-primary size-24" />
+        <div className={cn("mx-auto mb-4 rounded-full p-4", bgColor)}>
+          <TbMoodKid className={cn("size-24", iconColor)} />
         </div>
-        <CardTitle className="text-2xl font-bold">
+        <CardTitle className="text-xl sm:text-2xl font-bold">
           {babyCtx?.currentBaby?.name}'s Profile
         </CardTitle>
       </CardHeader>
@@ -93,7 +117,7 @@ export function CardBabyProfile() {
           <h4 className="text-muted-foreground mb-4 text-sm font-medium">
             Measurements
           </h4>
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div className="space-y-2">
               <Label className="text-muted-foreground text-sm font-medium">
                 Weight

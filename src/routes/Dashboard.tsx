@@ -17,7 +17,7 @@ function Dashboard() {
   if (babyCtx?.loading) {
     return (
       <div className="container mx-auto p-4">
-        <div className="mb-6 flex items-center justify-between">
+        <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="space-y-2">
             <Skeleton className="h-8 w-32" />
             <Skeleton className="h-4 w-64" />
@@ -26,7 +26,7 @@ function Dashboard() {
         </div>
         <Separator className="mb-6" />
 
-        <div className="grid w-full grid-cols-1 gap-6 md:grid-cols-3">
+        <div className="grid w-full grid-cols-1 gap-4 sm:gap-6 sm:grid-cols-2 xl:grid-cols-3">
           {/* Three columns of skeleton content */}
           {[1, 2, 3].map((col) => (
             <div key={col} className="flex flex-col gap-6">
@@ -71,9 +71,9 @@ function Dashboard() {
 
   return (
     <div className="container mx-auto p-4">
-      <div className="mb-6 flex items-center justify-between">
+      <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h2 className="text-2xl font-semibold tracking-tight">Dashboard</h2>
+          <h2 className="text-xl sm:text-2xl font-semibold tracking-tight">Dashboard</h2>
           <p className="text-muted-foreground text-sm">
             View and manage {babyCtx.currentBaby.name}'s daily activities
           </p>
@@ -82,17 +82,18 @@ function Dashboard() {
       </div>
       <Separator className="mb-6" />
 
-      <div className="grid w-full grid-cols-1 gap-6 md:grid-cols-3">
-        <div className="flex flex-col gap-6">
+      <div className="grid w-full grid-cols-1 gap-4 sm:gap-6 sm:grid-cols-2 xl:grid-cols-3">
+        <div className="flex flex-col gap-4 sm:gap-6">
           <CardRecord type="feeding" />
           <TableRecord type="feeding" />
         </div>
 
-        <div className="flex flex-col gap-6">
+        <div className="flex flex-col gap-4 sm:gap-6">
           <CardRecord type="diaper change" />
           <TableRecord type="diaper change" />
         </div>
-        <div className="flex flex-col gap-6">
+        
+        <div className="flex flex-col gap-4 sm:gap-6 sm:col-span-2 xl:col-span-1">
           <CardRecord type="sleep" />
           <TableRecord type="sleep" />
         </div>

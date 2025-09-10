@@ -40,3 +40,9 @@ export const calculateAge = (dateOfBirth: string) => {
     return `${days} day${days > 1 ? "s" : ""}`
   }
 }
+
+export const calculateAgeInMonths = (dateOfBirth: string): number => {
+  const birthDate = parseISO(dateOfBirth)
+  const now = new Date()
+  return differenceInMonths(now, birthDate)
+}

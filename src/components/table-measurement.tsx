@@ -10,6 +10,7 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import BabyContext from "@/context/BabyContext"
+import MeasurementContext from "@/context/MeasurementContext"
 import { format } from "date-fns"
 import {
   ArrowUpDown,
@@ -18,6 +19,7 @@ import {
   TrendingUp,
   TrendingDown,
   Minus,
+  Trash2,
 } from "lucide-react"
 import { Button } from "./ui/button"
 import { Badge } from "./ui/badge"
@@ -27,6 +29,17 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "./ui/tooltip"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "./ui/alert-dialog"
 import { cn } from "@/lib/utils"
 
 interface Measurement {
@@ -53,7 +66,9 @@ type SortDirection = "asc" | "desc"
 
 export function TableMeasurement({ type = "all" }: TableMeasurementProps) {
   const { currentBaby } = useContext(BabyContext) as BabyContextType
+  const { onMeasurementDelete } = useContext(MeasurementContext) || {}
   const measurements = currentBaby?.measurements || []
+  const [deletingId, setDeletingId] = useState<number | null>(null)
 
   // Always initialize with time in ascending order (oldest first)
   const [sortField, setSortField] = useState<SortField>("time")
@@ -91,10 +106,24 @@ export function TableMeasurement({ type = "all" }: TableMeasurementProps) {
     })
   }
 
+  const handleDeleteMeasurement = async (measurementId: number) => {
+    if (!onMeasurementDelete) return
+    
+    try {
+      setDeletingId(measurementId)
+      await onMeasurementDelete(measurementId)
+    } catch (error) {
+      console.error("Failed to delete measurement:", error)
+    } finally {
+      setDeletingId(null)
+    }
+  }
+
   return (
     <div className="space-y-4">
       <div className="rounded-md border">
-        <Table>
+        <div className="overflow-x-auto">
+          <Table className="min-w-[600px]">
           <TableHeader>
             <TableRow>
               <TableHead className="w-[180px]">
@@ -173,6 +202,11 @@ export function TableMeasurement({ type = "all" }: TableMeasurementProps) {
                       <ArrowUpDown className="h-4 w-4" />
                     )}
                   </Button>
+                </TableHead>
+              )}
+              {type === "all" && (
+                <TableHead className="w-[100px]">
+                  Actions
                 </TableHead>
               )}
             </TableRow>
@@ -322,10 +356,46 @@ export function TableMeasurement({ type = "all" }: TableMeasurementProps) {
                     </TooltipProvider>
                   </TableCell>
                 )}
+                {type === "all" && (
+                  <TableCell>
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
+                          disabled={deletingId === measurement.id}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Delete Measurement</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            Are you sure you want to delete this measurement from{" "}
+                            {format(new Date(measurement.time), "PPP")}? This action cannot be undone.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Cancel</AlertDialogCancel>
+                          <AlertDialogAction
+                            onClick={() => handleDeleteMeasurement(measurement.id)}
+                            className="bg-red-600 hover:bg-red-700"
+                            disabled={deletingId === measurement.id}
+                          >
+                            {deletingId === measurement.id ? "Deleting..." : "Delete"}
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  </TableCell>
+                )}
               </TableRow>
             ))}
           </TableBody>
-        </Table>
+          </Table>
+        </div>
       </div>
     </div>
   )

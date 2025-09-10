@@ -158,7 +158,8 @@ export function TableRecord({ type }: { type: string }) {
       <div
         className={`overflow-hidden rounded-lg border-2 ${getBorderColor(type)}`}
       >
-        <Table>
+        <div className="overflow-x-auto">
+          <Table className="min-w-[500px]">
           <TableCaption className="capitalize">{type} Records</TableCaption>
           <TableHeader>
             <TableRow>
@@ -166,7 +167,7 @@ export function TableRecord({ type }: { type: string }) {
                 <Button
                   variant="ghost"
                   onClick={() => handleSort("type")}
-                  className="-ml-2 h-8 px-2 py-1 font-medium"
+                  className="-ml-2 h-9 px-3 py-2 font-medium touch-manipulation"
                 >
                   Type
                   {getSortIcon("type")}
@@ -176,7 +177,7 @@ export function TableRecord({ type }: { type: string }) {
                 <Button
                   variant="ghost"
                   onClick={() => handleSort("startTime")}
-                  className="-ml-2 h-8 px-2 py-1 font-medium"
+                  className="-ml-2 h-9 px-3 py-2 font-medium touch-manipulation"
                 >
                   Time
                   {getSortIcon("startTime")}
@@ -186,7 +187,7 @@ export function TableRecord({ type }: { type: string }) {
                 <Button
                   variant="ghost"
                   onClick={() => handleSort("note")}
-                  className="-ml-2 h-8 px-2 py-1 font-medium"
+                  className="-ml-2 h-9 px-3 py-2 font-medium touch-manipulation"
                 >
                   Note
                   {getSortIcon("note")}
@@ -216,25 +217,30 @@ export function TableRecord({ type }: { type: string }) {
               </TableRow>
             ))}
           </TableBody>
-        </Table>
+          </Table>
+        </div>
       </div>
 
       {totalPages > 1 && (
-        <div className="flex justify-center gap-2">
+        <div className="flex flex-col items-center gap-3 sm:flex-row sm:justify-center sm:gap-4">
           <Button
             variant="outline"
+            size="lg"
+            className="touch-manipulation min-w-24"
             onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
             disabled={currentPage === 1}
           >
             Previous
           </Button>
-          <div className="flex items-center gap-1">
-            <span className="text-muted-foreground text-sm">
+          <div className="flex items-center gap-2">
+            <span className="text-muted-foreground text-sm font-medium">
               Page {currentPage} of {totalPages}
             </span>
           </div>
           <Button
             variant="outline"
+            size="lg"
+            className="touch-manipulation min-w-24"
             onClick={() =>
               setCurrentPage((prev) => Math.min(prev + 1, totalPages))
             }

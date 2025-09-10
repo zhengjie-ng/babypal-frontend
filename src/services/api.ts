@@ -23,28 +23,33 @@ api.interceptors.request.use(
     config.headers["Access-Control-Allow-Origin"] = API_URL
     config.headers["Access-Control-Allow-Credentials"] = true
 
-    let csrfToken = localStorage.getItem("CSRF_TOKEN")
-    if (!csrfToken) {
-      try {
-        const response = await axios.get(`${API_URL}/api/csrf-token`, {
-          withCredentials: true,
-          headers: {
-            "Access-Control-Allow-Origin": API_URL,
-            "Access-Control-Allow-Credentials": true,
-          },
-        })
-        csrfToken = response.data.token
-        if (csrfToken) {
-          localStorage.setItem("CSRF_TOKEN", csrfToken)
+    // Only add CSRF token for POST, PUT, DELETE requests
+    if (['post', 'put', 'delete'].includes(config.method?.toLowerCase() || '')) {
+      let csrfToken = localStorage.getItem("CSRF_TOKEN")
+      
+      if (!csrfToken) {
+        try {
+          const response = await axios.get(`${API_URL}/api/csrf-token`, {
+            withCredentials: true,
+            headers: {
+              "Access-Control-Allow-Origin": API_URL,
+              "Access-Control-Allow-Credentials": true,
+            },
+          })
+          csrfToken = response.data.token
+          if (csrfToken) {
+            localStorage.setItem("CSRF_TOKEN", csrfToken)
+          }
+        } catch (error) {
+          console.error("Failed to fetch CSRF token", error)
         }
-      } catch (error) {
-        console.error("Failed to fetch CSRF token", error)
+      }
+
+      if (csrfToken) {
+        config.headers["X-XSRF-TOKEN"] = csrfToken
       }
     }
-
-    if (csrfToken) {
-      config.headers["X-XSRF-TOKEN"] = csrfToken
-    }
+    
     return config
   },
   (error) => {
@@ -58,9 +63,10 @@ api.interceptors.response.use(
   (error) => {
     if (error.response?.status === 401) {
       console.log("Unauthorized access")
+      // Clear CSRF token on 401 as it might be expired
+      localStorage.removeItem("CSRF_TOKEN")
       // localStorage.removeItem("JWT_TOKEN")
       // localStorage.removeItem("USER")
-      // localStorage.removeItem("CSRF_TOKEN")
       // localStorage.removeItem("IS_ADMIN")
       // // Only redirect if we're not already on the login page
       // if (!window.location.pathname.includes("/login")) {
