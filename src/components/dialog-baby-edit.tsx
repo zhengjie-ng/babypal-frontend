@@ -35,6 +35,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
 import { toast } from "sonner"
 import { AiOutlineEdit } from "react-icons/ai"
+import { useEffect } from "react"
 
 const formSchema = z.object({
   name: z
@@ -55,32 +56,77 @@ export function DialogBabyEdit() {
   const babyCtx = useContext(BabyContext)
   const authCtx = useContext(AuthContext)
   const currentBaby = babyCtx?.currentBaby
-  const [caregivers, setCaregivers] = useState<string[]>(
-    currentBaby?.caregivers || []
-  )
-  const [date, setDate] = useState<Date | undefined>(
-    currentBaby ? new Date(currentBaby.dateOfBirth) : undefined
-  )
+  const [caregivers, setCaregivers] = useState<string[]>([])
+  const [date, setDate] = useState<Date | undefined>(undefined)
+  const [isOpen, setIsOpen] = useState(false)
   const dialogCloseRef = useRef<HTMLButtonElement>(null)
 
   const form = useForm<FormData>({
     mode: "onBlur",
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name: currentBaby?.name || "",
-      gender: currentBaby?.gender || undefined,
-      time: currentBaby
-        ? new Date(currentBaby.dateOfBirth).toLocaleTimeString([], {
-            hour: "2-digit",
-            minute: "2-digit",
-            hour12: false,
-          })
-        : undefined,
-      weight: currentBaby?.weight || 0,
-      height: currentBaby?.height || 0,
-      head: currentBaby?.headCircumference || 0,
+      name: "",
+      gender: undefined,
+      time: undefined,
+      weight: 0,
+      height: 0,
+      head: 0,
+      newCaregiver: "",
     },
   })
+
+  // Function to populate form with current baby data
+  const populateFormWithCurrentBaby = () => {
+    if (!currentBaby) return
+
+    // Set form values
+    form.setValue("name", currentBaby.name || "")
+    form.setValue("gender", currentBaby.gender || undefined)
+    form.setValue("weight", currentBaby.weight || 0)
+    form.setValue("height", currentBaby.height || 0)
+    form.setValue("head", currentBaby.headCircumference || 0)
+    
+    // Set time
+    if (currentBaby.dateOfBirth) {
+      const birthDate = new Date(currentBaby.dateOfBirth)
+      form.setValue("time", birthDate.toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: false,
+      }))
+      setDate(birthDate)
+    }
+    
+    // Set caregivers
+    setCaregivers(currentBaby.caregivers || [])
+  }
+
+  // Function to clear form data
+  const clearFormData = () => {
+    form.reset({
+      name: "",
+      gender: undefined,
+      time: undefined,
+      weight: 0,
+      height: 0,
+      head: 0,
+      newCaregiver: "",
+    })
+    setDate(undefined)
+    setCaregivers([])
+  }
+
+  // Handle dialog open/close
+  const handleOpenChange = (open: boolean) => {
+    setIsOpen(open)
+    if (open) {
+      // Populate form when dialog opens
+      populateFormWithCurrentBaby()
+    } else {
+      // Clear form when dialog closes
+      clearFormData()
+    }
+  }
 
   const handleAddCaregiver = async () => {
     const newCaregiver = form.getValues("newCaregiver")?.toLowerCase()
@@ -160,7 +206,7 @@ export function DialogBabyEdit() {
       })
 
       toast.success("Baby updated successfully!")
-      dialogCloseRef.current?.click() // Close the dialog
+      handleOpenChange(false) // Close the dialog and clear form
     } catch (error) {
       toast.error("Failed to update baby")
       console.error("Error updating baby:", error)
@@ -168,7 +214,7 @@ export function DialogBabyEdit() {
   }
 
   return (
-    <Dialog>
+    <Dialog open={isOpen} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
         <Button variant="outline" size="icon">
           <AiOutlineEdit className="size-4" />
@@ -201,7 +247,7 @@ export function DialogBabyEdit() {
           <div className="grid gap-3">
             <Label htmlFor="gender">Gender</Label>
             <Select
-              defaultValue={currentBaby?.gender}
+              value={form.watch("gender") || ""}
               onValueChange={(value) => form.setValue("gender", value)}
             >
               <SelectTrigger>
@@ -353,11 +399,13 @@ export function DialogBabyEdit() {
           </div>
 
           <DialogFooter className="mt-4">
-            <DialogClose ref={dialogCloseRef} asChild>
-              <Button type="button" variant="outline">
-                Cancel
-              </Button>
-            </DialogClose>
+            <Button 
+              type="button" 
+              variant="outline" 
+              onClick={() => handleOpenChange(false)}
+            >
+              Cancel
+            </Button>
             <Button type="submit">Save Changes</Button>
           </DialogFooter>
         </form>
