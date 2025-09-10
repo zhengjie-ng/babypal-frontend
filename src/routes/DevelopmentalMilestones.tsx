@@ -153,8 +153,8 @@ function DevelopmentalMilestones() {
         {/* Header */}
         <div className="text-center space-y-4">
           <div className="space-y-2">
-            <h1 className="text-3xl font-bold tracking-tight">Developmental Milestones</h1>
-            <p className="text-muted-foreground">
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Developmental Milestones</h1>
+            <p className="text-muted-foreground text-sm sm:text-base px-4">
               Track your baby's growth and development through each month of their first years
             </p>
             {currentBabyMonths !== null && babyCtx?.currentBaby && (
@@ -165,7 +165,7 @@ function DevelopmentalMilestones() {
           </div>
           
           {/* Month Filter Dropdown */}
-          <div className="max-w-sm mx-auto">
+          <div className="max-w-sm mx-auto px-4">
             <Select value={selectedMonth} onValueChange={setSelectedMonth}>
               <SelectTrigger className="w-full">
                 <SelectValue placeholder="Filter by month" />
@@ -182,7 +182,7 @@ function DevelopmentalMilestones() {
         </div>
 
         {/* Growth Guides Grid */}
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-4 sm:gap-6 sm:grid-cols-2 lg:grid-cols-3 px-2 sm:px-0">
           {filteredGrowthGuides.map((guide) => {
             const isCurrentBabyAge = currentBabyMonths !== null && guide.id === currentBabyMonths
             return (

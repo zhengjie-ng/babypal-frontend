@@ -122,7 +122,8 @@ export function TableMeasurement({ type = "all" }: TableMeasurementProps) {
   return (
     <div className="space-y-4">
       <div className="rounded-md border">
-        <Table>
+        <div className="overflow-x-auto">
+          <Table className="min-w-[600px]">
           <TableHeader>
             <TableRow>
               <TableHead className="w-[180px]">
@@ -393,7 +394,8 @@ export function TableMeasurement({ type = "all" }: TableMeasurementProps) {
               </TableRow>
             ))}
           </TableBody>
-        </Table>
+          </Table>
+        </div>
       </div>
     </div>
   )

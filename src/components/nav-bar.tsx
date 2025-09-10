@@ -211,7 +211,7 @@ export const Navbar05 = React.forwardRef<HTMLElement, Navbar05Props>(
         <header
           ref={combinedRef}
           className={cn(
-            "bg-background/95 supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50 w-full border-b px-4 backdrop-blur md:px-6 [&_*]:no-underline",
+            "bg-background/95 supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50 w-full border-b px-2 sm:px-4 backdrop-blur md:px-6 [&_*]:no-underline",
             className
           )}
           {...props}
@@ -306,7 +306,7 @@ export const Navbar05 = React.forwardRef<HTMLElement, Navbar05Props>(
               </div>
             </div>
             {/* Right side */}
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2 sm:gap-4">
               <div className="flex items-center gap-2">
                 <ThemeToggle />
               </div>

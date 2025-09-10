@@ -338,13 +338,13 @@ export const CardTimeline = () => {
   return (
     <Card className="overflow-hidden border-1 shadow-lg">
       <CardHeader className="border-b">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-3">
             <div className="rounded-xl p-2">
               <Activity className="h-6 w-6 text-white" />
             </div>
             <div>
-              <h3 className="bg-clip-text text-2xl font-bold">
+              <h3 className="bg-clip-text text-xl sm:text-2xl font-bold">
                 Activity Timeline
               </h3>
               <p className="text-muted-foreground text-sm">
@@ -352,17 +352,17 @@ export const CardTimeline = () => {
               </p>
             </div>
           </div>
-          <div className="flex items-center gap-3">
-            <DialogRecordAdd />
+          <div className="flex items-center justify-between sm:justify-end gap-3">
             <Badge variant="secondary" className="backdrop-blur">
               <Calendar className="mr-1 h-3 w-3" />
               {Object.keys(timelineData).length} Days
             </Badge>
+            <DialogRecordAdd />
           </div>
         </div>
       </CardHeader>
 
-      <CardContent className="p-6">
+      <CardContent className="p-4 sm:p-6">
         {Object.keys(timelineData).length === 0 ? (
           <div className="space-y-4 py-12 text-center">
             <div className="mx-auto flex h-24 w-24 items-center justify-center rounded-full bg-muted">
@@ -387,13 +387,13 @@ export const CardTimeline = () => {
                 )
                 .map(([date, items]) => (
                   <CarouselItem key={date} className="basis-full pl-2 md:pl-4">
-                    <div className="rounded-2xl border bg-gradient-to-br from-card to-muted/50 p-6">
+                    <div className="rounded-2xl border bg-gradient-to-br from-card to-muted/50 p-4 sm:p-6">
                       <div className="mb-6 flex items-center gap-3 border-b pb-4">
                         <div className="rounded-lg bg-primary/10 p-2 shadow-sm">
                           <Calendar className="h-5 w-5 text-primary" />
                         </div>
                         <div>
-                          <h4 className="text-xl font-semibold">
+                          <h4 className="text-lg sm:text-xl font-semibold">
                             {format(new Date(date), "EEEE, MMMM d")}
                           </h4>
                           <p className="text-muted-foreground text-sm">

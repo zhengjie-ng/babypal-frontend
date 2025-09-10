@@ -65,7 +65,7 @@ export function CardBabyProfile() {
         <div className={cn("mx-auto mb-4 rounded-full p-4", bgColor)}>
           <TbMoodKid className={cn("size-24", iconColor)} />
         </div>
-        <CardTitle className="text-2xl font-bold">
+        <CardTitle className="text-xl sm:text-2xl font-bold">
           {babyCtx?.currentBaby?.name}'s Profile
         </CardTitle>
       </CardHeader>
@@ -117,7 +117,7 @@ export function CardBabyProfile() {
           <h4 className="text-muted-foreground mb-4 text-sm font-medium">
             Measurements
           </h4>
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div className="space-y-2">
               <Label className="text-muted-foreground text-sm font-medium">
                 Weight
