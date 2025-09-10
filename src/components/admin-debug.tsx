@@ -48,25 +48,37 @@ export function AdminDebug() {
           <div className="grid grid-cols-2 gap-4 text-sm">
             <div>
               <span className="text-muted-foreground">Has Token:</span>
-              <Badge variant={debugInfo.hasToken ? "default" : "destructive"} className="ml-2">
+              <Badge 
+                variant={debugInfo.hasToken ? "default" : "destructive"} 
+                className={`ml-2 ${debugInfo.hasToken ? "dark:text-white" : ""}`}
+              >
                 {debugInfo.hasToken ? "Yes" : "No"}
               </Badge>
             </div>
             <div>
               <span className="text-muted-foreground">Auth Loading:</span>
-              <Badge variant={debugInfo.authLoading ? "secondary" : "default"} className="ml-2">
+              <Badge 
+                variant={debugInfo.authLoading ? "secondary" : "default"} 
+                className={`ml-2 ${!debugInfo.authLoading ? "dark:text-white" : ""}`}
+              >
                 {debugInfo.authLoading ? "Yes" : "No"}
               </Badge>
             </div>
             <div>
               <span className="text-muted-foreground">Auth Is Admin:</span>
-              <Badge variant={debugInfo.authIsAdmin ? "default" : "destructive"} className="ml-2">
+              <Badge 
+                variant={debugInfo.authIsAdmin ? "default" : "destructive"} 
+                className={`ml-2 ${debugInfo.authIsAdmin ? "dark:text-white" : ""}`}
+              >
                 {debugInfo.authIsAdmin ? "Yes" : "No"}
               </Badge>
             </div>
             <div>
               <span className="text-muted-foreground">Storage Is Admin:</span>
-              <Badge variant={debugInfo.storedIsAdmin === "true" ? "default" : "destructive"} className="ml-2">
+              <Badge 
+                variant={debugInfo.storedIsAdmin === "true" ? "default" : "destructive"} 
+                className={`ml-2 ${debugInfo.storedIsAdmin === "true" ? "dark:text-white" : ""}`}
+              >
                 {debugInfo.storedIsAdmin || "Not set"}
               </Badge>
             </div>
@@ -98,7 +110,10 @@ export function AdminDebug() {
           <div className="text-sm space-y-1">
             <div>
               <span className="text-muted-foreground">Admin Loading:</span>
-              <Badge variant={debugInfo.adminLoading ? "secondary" : "default"} className="ml-2">
+              <Badge 
+                variant={debugInfo.adminLoading ? "secondary" : "default"} 
+                className={`ml-2 ${!debugInfo.adminLoading ? "dark:text-white" : ""}`}
+              >
                 {debugInfo.adminLoading ? "Yes" : "No"}
               </Badge>
             </div>
