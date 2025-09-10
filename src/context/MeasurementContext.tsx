@@ -21,6 +21,7 @@ interface MeasurementContextType {
   onMeasurementAdd: (
     measurementData: Omit<Measurement, "id">
   ) => Promise<Measurement>
+  onMeasurementDelete: (measurementId: number) => Promise<void>
   refreshMeasurements: () => Promise<void>
   lastUpdate: number
 }
@@ -108,8 +109,28 @@ export function MeasurementProvider({ children }: { children: ReactNode }) {
     }
   }
 
+  const onMeasurementDelete = async (measurementId: number) => {
+    try {
+      await api.delete(`/measurements/${measurementId}`)
+      toast.success("Measurement deleted successfully!")
+      await refreshMeasurements()
+      setLastUpdate(Date.now())
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        const errorMessage =
+          error.response?.data?.message || "Failed to delete measurement"
+        toast.error(errorMessage)
+      } else {
+        toast.error("Failed to delete measurement")
+        console.error(error)
+      }
+      throw error
+    }
+  }
+
   const contextValue: MeasurementContextType = {
     onMeasurementAdd,
+    onMeasurementDelete,
     refreshMeasurements,
     lastUpdate,
   }

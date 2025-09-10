@@ -354,6 +354,7 @@ function Admin() {
                 variant={activeTab === "users" ? "default" : "outline"}
                 size="sm"
                 onClick={() => handleTabChange("users")}
+                className={activeTab === "users" ? "dark:text-white" : ""}
               >
                 <Users className="mr-2 h-4 w-4" />
                 Users
@@ -362,6 +363,7 @@ function Admin() {
                 variant={activeTab === "babies" ? "default" : "outline"}
                 size="sm"
                 onClick={() => handleTabChange("babies")}
+                className={activeTab === "babies" ? "dark:text-white" : ""}
               >
                 <Baby className="mr-2 h-4 w-4" />
                 Babies

@@ -29,6 +29,8 @@ import {
   Ruler,
   ChevronLeft,
   ChevronRight,
+  Trash2,
+  Stethoscope,
 } from "lucide-react"
 
 interface TimelineItem {
@@ -72,99 +74,146 @@ interface RecordContextType {
   lastUpdate: number
 }
 
+// Helper function to detect activity type from note keywords
+const detectActivityFromNote = (note: string | null): string => {
+  if (!note) return "activity"
+  
+  const normalizedNote = note.toLowerCase()
+  
+  // Check for play-related keywords
+  if (normalizedNote.includes("play") || normalizedNote.includes("tummy") || 
+      normalizedNote.includes("activity") || normalizedNote.includes("game")) {
+    return "play"
+  }
+  
+  // Check for bath-related keywords
+  if (normalizedNote.includes("bath") || normalizedNote.includes("shower") || 
+      normalizedNote.includes("wash") || normalizedNote.includes("clean")) {
+    return "bath"
+  }
+  
+  // Check for temperature-related keywords
+  if (normalizedNote.includes("temperature") || normalizedNote.includes("fever") || 
+      normalizedNote.includes("temp") || normalizedNote.includes("hot") || 
+      normalizedNote.includes("cold")) {
+    return "temperature"
+  }
+  
+  // Check for weight-related keywords
+  if (normalizedNote.includes("weight") || normalizedNote.includes("weigh") || 
+      normalizedNote.includes("scale") || normalizedNote.includes("kg") || 
+      normalizedNote.includes("lb")) {
+    return "weight"
+  }
+  
+  // Check for height-related keywords
+  if (normalizedNote.includes("height") || normalizedNote.includes("length") || 
+      normalizedNote.includes("measure") || normalizedNote.includes("cm") || 
+      normalizedNote.includes("inch")) {
+    return "height"
+  }
+  
+  // Check for medical-related keywords
+  if (normalizedNote.includes("doctor") || normalizedNote.includes("medicine") || 
+      normalizedNote.includes("medication") || normalizedNote.includes("checkup") || 
+      normalizedNote.includes("visit")) {
+    return "medical"
+  }
+  
+  return "activity"
+}
+
 // Helper function to get icon and color for different record types
-const getRecordTypeInfo = (type: string) => {
+const getRecordTypeInfo = (type: string, note?: string | null) => {
   const normalizedType = type.toLowerCase()
+
+  // Handle "others" type by analyzing the note
+  if (normalizedType === "others" || normalizedType === "other") {
+    const detectedType = detectActivityFromNote(note || null)
+    return getRecordTypeInfo(detectedType)
+  }
 
   switch (normalizedType) {
     case "feeding":
-    case "feed":
-    case "milk":
-    case "bottle":
       return {
         icon: Utensils,
-        color: "bg-green-500",
-        bgColor: "bg-green-50",
-        textColor: "text-green-700",
-        borderColor: "border-green-200",
+        color: "bg-green-500 dark:bg-green-600",
+        bgColor: "bg-green-50 dark:bg-green-950/50",
+        textColor: "text-green-700 dark:text-green-300",
+        borderColor: "border-green-200 dark:border-green-800",
       }
     case "sleep":
-    case "nap":
-    case "bedtime":
       return {
         icon: Moon,
-        color: "bg-blue-500",
-        bgColor: "bg-blue-50",
-        textColor: "text-blue-700",
-        borderColor: "border-blue-200",
+        color: "bg-blue-500 dark:bg-blue-600",
+        bgColor: "bg-blue-50 dark:bg-blue-950/50",
+        textColor: "text-blue-700 dark:text-blue-300",
+        borderColor: "border-blue-200 dark:border-blue-800",
       }
-    case "diaper":
-    case "change":
-    case "wet":
-    case "dirty":
+    case "diaper change":
       return {
-        icon: Baby,
-        color: "bg-yellow-500",
-        bgColor: "bg-yellow-50",
-        textColor: "text-yellow-700",
-        borderColor: "border-yellow-200",
+        icon: Trash2,
+        color: "bg-yellow-500 dark:bg-yellow-600",
+        bgColor: "bg-yellow-50 dark:bg-yellow-950/50",
+        textColor: "text-yellow-700 dark:text-yellow-300",
+        borderColor: "border-yellow-200 dark:border-yellow-800",
       }
     case "bath":
-    case "bathing":
-    case "shower":
       return {
         icon: Bath,
-        color: "bg-cyan-500",
-        bgColor: "bg-cyan-50",
-        textColor: "text-cyan-700",
-        borderColor: "border-cyan-200",
+        color: "bg-cyan-500 dark:bg-cyan-600",
+        bgColor: "bg-cyan-50 dark:bg-cyan-950/50",
+        textColor: "text-cyan-700 dark:text-cyan-300",
+        borderColor: "border-cyan-200 dark:border-cyan-800",
       }
     case "temperature":
-    case "fever":
-    case "temp":
       return {
         icon: Thermometer,
-        color: "bg-red-500",
-        bgColor: "bg-red-50",
-        textColor: "text-red-700",
-        borderColor: "border-red-200",
+        color: "bg-red-500 dark:bg-red-600",
+        bgColor: "bg-red-50 dark:bg-red-950/50",
+        textColor: "text-red-700 dark:text-red-300",
+        borderColor: "border-red-200 dark:border-red-800",
       }
     case "weight":
-    case "weigh":
       return {
         icon: Scale,
-        color: "bg-purple-500",
-        bgColor: "bg-purple-50",
-        textColor: "text-purple-700",
-        borderColor: "border-purple-200",
+        color: "bg-purple-500 dark:bg-purple-600",
+        bgColor: "bg-purple-50 dark:bg-purple-950/50",
+        textColor: "text-purple-700 dark:text-purple-300",
+        borderColor: "border-purple-200 dark:border-purple-800",
       }
     case "height":
-    case "length":
-    case "measure":
       return {
         icon: Ruler,
-        color: "bg-indigo-500",
-        bgColor: "bg-indigo-50",
-        textColor: "text-indigo-700",
-        borderColor: "border-indigo-200",
+        color: "bg-indigo-500 dark:bg-indigo-600",
+        bgColor: "bg-indigo-50 dark:bg-indigo-950/50",
+        textColor: "text-indigo-700 dark:text-indigo-300",
+        borderColor: "border-indigo-200 dark:border-indigo-800",
       }
     case "play":
-    case "activity":
-    case "tummy":
       return {
         icon: Heart,
-        color: "bg-pink-500",
-        bgColor: "bg-pink-50",
-        textColor: "text-pink-700",
-        borderColor: "border-pink-200",
+        color: "bg-pink-500 dark:bg-pink-600",
+        bgColor: "bg-pink-50 dark:bg-pink-950/50",
+        textColor: "text-pink-700 dark:text-pink-300",
+        borderColor: "border-pink-200 dark:border-pink-800",
       }
+    case "medical":
+      return {
+        icon: Stethoscope,
+        color: "bg-red-500 dark:bg-red-600",
+        bgColor: "bg-red-50 dark:bg-red-950/50",
+        textColor: "text-red-700 dark:text-red-300",
+        borderColor: "border-red-200 dark:border-red-800",
+      }
+    case "activity":
     default:
       return {
         icon: Activity,
-        color: "bg-gray-500",
-        bgColor: "bg-gray-50",
-        textColor: "text-gray-700",
-        borderColor: "border-gray-200",
+        color: "bg-slate-500 dark:bg-slate-600",
+        bgColor: "bg-slate-50 dark:bg-slate-950/50",
+        textColor: "text-slate-700 dark:text-slate-300",
+        borderColor: "border-slate-200 dark:border-slate-800",
       }
   }
 }
@@ -289,13 +338,13 @@ export const CardTimeline = () => {
   return (
     <Card className="overflow-hidden border-1 shadow-lg">
       <CardHeader className="border-b">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-3">
             <div className="rounded-xl p-2">
               <Activity className="h-6 w-6 text-white" />
             </div>
             <div>
-              <h3 className="bg-clip-text text-2xl font-bold">
+              <h3 className="bg-clip-text text-xl sm:text-2xl font-bold">
                 Activity Timeline
               </h3>
               <p className="text-muted-foreground text-sm">
@@ -303,24 +352,24 @@ export const CardTimeline = () => {
               </p>
             </div>
           </div>
-          <div className="flex items-center gap-3">
-            <DialogRecordAdd />
-            <Badge variant="secondary" className="bg-white/80 backdrop-blur">
+          <div className="flex items-center justify-between sm:justify-end gap-3">
+            <Badge variant="secondary" className="backdrop-blur">
               <Calendar className="mr-1 h-3 w-3" />
               {Object.keys(timelineData).length} Days
             </Badge>
+            <DialogRecordAdd />
           </div>
         </div>
       </CardHeader>
 
-      <CardContent className="p-6">
+      <CardContent className="p-4 sm:p-6">
         {Object.keys(timelineData).length === 0 ? (
           <div className="space-y-4 py-12 text-center">
-            <div className="mx-auto flex h-24 w-24 items-center justify-center rounded-full bg-gray-100">
-              <Clock className="h-8 w-8 text-gray-400" />
+            <div className="mx-auto flex h-24 w-24 items-center justify-center rounded-full bg-muted">
+              <Clock className="h-8 w-8 text-muted-foreground" />
             </div>
             <div className="space-y-2">
-              <h4 className="text-lg font-medium text-gray-900">
+              <h4 className="text-lg font-medium">
                 No activities yet
               </h4>
               <p className="text-muted-foreground">
@@ -338,13 +387,13 @@ export const CardTimeline = () => {
                 )
                 .map(([date, items]) => (
                   <CarouselItem key={date} className="basis-full pl-2 md:pl-4">
-                    <div className="rounded-2xl border border-gray-200/50 bg-gradient-to-br from-gray-50 to-gray-100/50 p-6">
-                      <div className="mb-6 flex items-center gap-3 border-b border-gray-200/60 pb-4">
-                        <div className="rounded-lg bg-white p-2 shadow-sm">
-                          <Calendar className="h-5 w-5 text-blue-600" />
+                    <div className="rounded-2xl border bg-gradient-to-br from-card to-muted/50 p-4 sm:p-6">
+                      <div className="mb-6 flex items-center gap-3 border-b pb-4">
+                        <div className="rounded-lg bg-primary/10 p-2 shadow-sm">
+                          <Calendar className="h-5 w-5 text-primary" />
                         </div>
                         <div>
-                          <h4 className="text-xl font-semibold text-gray-900">
+                          <h4 className="text-lg sm:text-xl font-semibold">
                             {format(new Date(date), "EEEE, MMMM d")}
                           </h4>
                           <p className="text-muted-foreground text-sm">
@@ -356,13 +405,19 @@ export const CardTimeline = () => {
 
                       <div className="space-y-4">
                         {items.map((item, index) => {
-                          const typeInfo = getRecordTypeInfo(item.title)
+                          // Find the original record to get the main type and note
+                          const originalRecord = currentBaby?.records?.find(
+                            (record) => record.id === item.id
+                          )
+                          const mainType =
+                            originalRecord?.type || item.title.split(" - ")[0]
+                          const typeInfo = getRecordTypeInfo(mainType, originalRecord?.note)
                           const Icon = typeInfo.icon
 
                           return (
                             <div
                               key={item.id}
-                              className={`group relative cursor-pointer rounded-xl border p-4 transition-all duration-200 hover:scale-[1.02] hover:shadow-md ${typeInfo.bgColor} ${typeInfo.borderColor} bg-white/60 backdrop-blur-sm`}
+                              className={`group relative cursor-pointer rounded-xl border p-4 transition-all duration-200 hover:scale-[1.02] hover:shadow-md ${typeInfo.bgColor} ${typeInfo.borderColor} bg-card/60 backdrop-blur-sm`}
                               onDoubleClick={() =>
                                 handleTimelineItemDoubleClick(item)
                               }
@@ -370,7 +425,7 @@ export const CardTimeline = () => {
                             >
                               {/* Timeline connector */}
                               {index < items.length - 1 && (
-                                <div className="absolute top-16 left-8 h-4 w-0.5 rounded-full bg-gray-200" />
+                                <div className="absolute top-16 left-8 h-4 w-0.5 rounded-full bg-border" />
                               )}
 
                               <div className="flex items-start gap-4">
@@ -385,7 +440,7 @@ export const CardTimeline = () => {
                                 <div className="min-w-0 flex-1">
                                   <div className="mb-2 flex items-center gap-2">
                                     <div
-                                      className={`inline-flex items-center gap-1 rounded-full px-2 py-1 text-xs font-medium ${typeInfo.textColor} bg-white/80`}
+                                      className={`inline-flex items-center gap-1 rounded-full px-2 py-1 text-xs font-medium ${typeInfo.textColor} bg-card/80`}
                                     >
                                       <Clock className="h-3 w-3" />
                                       {item.time}
@@ -399,7 +454,7 @@ export const CardTimeline = () => {
                                   </div>
 
                                   {item.description && (
-                                    <p className="text-sm leading-relaxed text-gray-600">
+                                    <p className="text-sm leading-relaxed text-muted-foreground">
                                       {item.description}
                                     </p>
                                   )}
@@ -407,7 +462,7 @@ export const CardTimeline = () => {
                               </div>
 
                               {/* Hover effect */}
-                              <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-transparent via-white/5 to-transparent opacity-0 transition-opacity duration-200 group-hover:opacity-100" />
+                              <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-transparent via-foreground/5 to-transparent opacity-0 transition-opacity duration-200 group-hover:opacity-100" />
                             </div>
                           )
                         })}
@@ -419,13 +474,13 @@ export const CardTimeline = () => {
 
             {/* Custom navigation */}
             <div className="mt-6 flex items-center justify-center gap-4">
-              <CarouselPrevious className="relative translate-y-0 transform-none border-2 border-gray-200 bg-white shadow-sm transition-all duration-200 hover:border-blue-300 hover:bg-blue-50">
+              <CarouselPrevious className="relative translate-y-0 transform-none border-2 border-border bg-card shadow-sm transition-all duration-200 hover:border-primary/30 hover:bg-accent">
                 <ChevronLeft className="h-4 w-4" />
               </CarouselPrevious>
               <div className="text-muted-foreground px-2 text-xs">
                 Navigate days
               </div>
-              <CarouselNext className="relative translate-y-0 transform-none border-2 border-gray-200 bg-white shadow-sm transition-all duration-200 hover:border-blue-300 hover:bg-blue-50">
+              <CarouselNext className="relative translate-y-0 transform-none border-2 border-border bg-card shadow-sm transition-all duration-200 hover:border-primary/30 hover:bg-accent">
                 <ChevronRight className="h-4 w-4" />
               </CarouselNext>
             </div>

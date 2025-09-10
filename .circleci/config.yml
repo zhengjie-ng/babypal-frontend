@@ -2,9 +2,19 @@ version: 2.1
 orbs:
   node: circleci/node@5.0.1
   docker: circleci/docker@2.1.4
-  snyk: snyk/snyk@1.5.0
+  snyk: snyk/snyk@2.3.0
 
 jobs:
+  secrets_scan_local:
+    docker:
+      - image: zricethezav/gitleaks:latest
+    steps:
+      - checkout
+      - run:
+          name: Run gitleaks scan (local files only)
+          # --source . : scan current directory and all subdirectories
+          # --no-git : do not scan git history
+          command: gitleaks detect --source . --no-git
   build:
     docker:
       - image: cimg/node:22.19
@@ -13,6 +23,16 @@ jobs:
 
       - node/install-packages:
           pkg-manager: npm
+  # Snyk Static Application Security Testing (code scan)
+  snyk_sast:
+    docker:
+      - image: cimg/openjdk:17.0
+    steps:
+      - checkout
+      - snyk/scan:
+          command: code test
+          fail-on-issues: false
+          severity-threshold: medium
 
   test:
     docker:
@@ -85,11 +105,21 @@ jobs:
 workflows:
   workflow-develop:
     jobs:
+      - secrets_scan_local:
+          filters:
+            branches:
+              only: develop
       - build:
           filters:
             branches:
               only: develop
       - test:
+          requires:
+            - build
+          filters:
+            branches:
+              only: develop
+      - snyk_sast:
           requires:
             - build
           filters:
@@ -104,12 +134,17 @@ workflows:
       - publish:
           requires:
             - test
+            - scan
           filters:
             branches:
               only: develop
 
   workflow-release:
     jobs:
+      - secrets_scan_local:
+          filters:
+            branches:
+              only: release
       - build:
           filters:
             branches:
@@ -121,6 +156,12 @@ workflows:
             branches:
               only: release
       - scan:
+          requires:
+            - build
+          filters:
+            branches:
+              only: release
+      - snyk_sast:
           requires:
             - build
           filters:
@@ -135,6 +176,8 @@ workflows:
       - deploy:
           requires:
             - publish
+            - scan
+            - snyk_sast
           filters:
             branches:
               only: release

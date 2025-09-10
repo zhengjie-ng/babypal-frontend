@@ -44,6 +44,7 @@ import { FaBaby } from "react-icons/fa"
 // import type { ComponentProps } from "react"
 import AuthContext from "@/context/AuthContext"
 import { useNavigate, Outlet, useLocation } from "react-router-dom"
+import { ThemeToggle } from "./theme-toggle"
 
 // User Menu Component
 const UserMenu = ({
@@ -120,6 +121,7 @@ const baseNavigationLinks: Navbar05NavItem[] = [
   { href: "/home", label: "Home" },
   { href: "/dashboard", label: "Dashboard" },
   { href: "/measurements", label: "Measurements" },
+  { href: "/milestones", label: "Developmental Milestones" },
 ]
 
 const adminNavigationLink: Navbar05NavItem = { href: "/admin", label: "Admin" }
@@ -209,7 +211,7 @@ export const Navbar05 = React.forwardRef<HTMLElement, Navbar05Props>(
         <header
           ref={combinedRef}
           className={cn(
-            "bg-background/95 supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50 w-full border-b px-4 backdrop-blur md:px-6 [&_*]:no-underline",
+            "bg-background/95 supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50 w-full border-b px-2 sm:px-4 backdrop-blur md:px-6 [&_*]:no-underline",
             className
           )}
           {...props}
@@ -304,8 +306,10 @@ export const Navbar05 = React.forwardRef<HTMLElement, Navbar05Props>(
               </div>
             </div>
             {/* Right side */}
-            <div className="flex items-center gap-4">
-              <div className="flex items-center gap-2"></div>
+            <div className="flex items-center gap-2 sm:gap-4">
+              <div className="flex items-center gap-2">
+                <ThemeToggle />
+              </div>
               {/* User menu */}
               <UserMenu
                 username={

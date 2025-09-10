@@ -82,9 +82,9 @@ function Measurements() {
 
   return (
     <div className="container mx-auto p-4">
-      <div className="mb-6 flex items-center justify-between">
+      <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h2 className="text-2xl font-semibold tracking-tight">
+          <h2 className="text-xl sm:text-2xl font-semibold tracking-tight">
             Measurements
           </h2>
           <p className="text-muted-foreground text-sm">
@@ -95,23 +95,23 @@ function Measurements() {
       </div>
       <Separator className="mb-6" />
 
-      <div className="grid w-full grid-cols-1 gap-6 md:grid-cols-3">
-        <div className="flex flex-col gap-6 md:col-span-3">
+      <div className="grid w-full grid-cols-1 gap-6 lg:grid-cols-3">
+        <div className="flex flex-col gap-6 lg:col-span-3">
           <TableMeasurement type="all" />
         </div>
 
         <div className="flex flex-col gap-6">
-          <h3 className="text-lg font-semibold">Weight History</h3>
+          <h3 className="text-base sm:text-lg font-semibold">Weight History</h3>
           <TableMeasurement type="weight" />
         </div>
 
         <div className="flex flex-col gap-6">
-          <h3 className="text-lg font-semibold">Height History</h3>
+          <h3 className="text-base sm:text-lg font-semibold">Height History</h3>
           <TableMeasurement type="height" />
         </div>
 
         <div className="flex flex-col gap-6">
-          <h3 className="text-lg font-semibold">Head Circumference History</h3>
+          <h3 className="text-base sm:text-lg font-semibold">Head Circumference History</h3>
           <TableMeasurement type="headCircumference" />
         </div>
       </div>
