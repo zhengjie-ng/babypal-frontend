@@ -7,7 +7,7 @@ A modern React application for tracking baby development, measurements, and mile
 - 👶 Baby profile management
 - 📊 Growth measurements tracking
 - 📝 Daily records and activities
-- 🎯 Developmental milestones monitoring  
+- 🎯 Developmental milestones monitoring
 - 📈 Dashboard with visual insights
 - 🌙 Dark/light theme support
 - 👨‍💼 Admin panel for user management
@@ -38,23 +38,27 @@ A modern React application for tracking baby development, measurements, and mile
 ### Installation
 
 1. Clone the repository:
+
 ```bash
 git clone <repository-url>
 cd babypal-frontend
 ```
 
 2. Install dependencies:
+
 ```bash
 npm install
 ```
 
 3. Set up environment variables:
-Create a `.env` file in the root directory and add:
+   Create a `.env` file in the root directory and add:
+
 ```env
-VITE_API_URL=http://localhost:3000/api
+VITE_API_URL=https://d133jijqsdl8sk.cloudfront.net
 ```
 
 4. Start the development server:
+
 ```bash
 npm run dev
 ```
@@ -87,26 +91,31 @@ src/
 ## Key Features
 
 ### Baby Management
+
 - Add and manage multiple baby profiles
 - Track basic information and photos
 - Switch between different babies
 
 ### Measurements Tracking
+
 - Record height, weight, and head circumference
 - Visual charts and growth trends
 - Compare against standard growth curves
 
 ### Daily Records
+
 - Log feeding, sleeping, and diaper changes
 - Add notes and observations
 - Timeline view of activities
 
 ### Developmental Milestones
+
 - Track important developmental markers
 - Age-appropriate milestone suggestions
 - Progress visualization
 
 ### Admin Features
+
 - User management dashboard
 - System-wide baby and record management
 - Debug tools and analytics
@@ -114,6 +123,7 @@ src/
 ## Authentication
 
 The app uses JWT-based authentication with:
+
 - User registration and login
 - Password reset functionality
 - Secure route protection
