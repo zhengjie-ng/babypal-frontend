@@ -25,9 +25,9 @@ api.interceptors.request.use(
 
     // Only add CSRF token for POST, PUT, DELETE requests
     if (['post', 'put', 'delete'].includes(config.method?.toLowerCase() || '')) {
-      let csrfData = JSON.parse(localStorage.getItem("CSRF_DATA") || 'null')
+      let csrfToken = localStorage.getItem("CSRF_TOKEN")
       
-      if (!csrfData) {
+      if (!csrfToken) {
         try {
           const response = await axios.get(`${API_URL}/api/csrf-token`, {
             withCredentials: true,
@@ -36,17 +36,17 @@ api.interceptors.request.use(
               "Access-Control-Allow-Credentials": true,
             },
           })
-          csrfData = response.data
-          if (csrfData) {
-            localStorage.setItem("CSRF_DATA", JSON.stringify(csrfData))
+          csrfToken = response.data.token
+          if (csrfToken) {
+            localStorage.setItem("CSRF_TOKEN", csrfToken)
           }
         } catch (error) {
           console.error("Failed to fetch CSRF token", error)
         }
       }
 
-      if (csrfData?.token && csrfData?.headerName) {
-        config.headers[csrfData.headerName] = csrfData.token
+      if (csrfToken) {
+        config.headers["X-XSRF-TOKEN"] = csrfToken
       }
     }
     
@@ -63,8 +63,8 @@ api.interceptors.response.use(
   (error) => {
     if (error.response?.status === 401) {
       console.log("Unauthorized access")
-      // Clear CSRF data on 401 as it might be expired
-      localStorage.removeItem("CSRF_DATA")
+      // Clear CSRF token on 401 as it might be expired
+      localStorage.removeItem("CSRF_TOKEN")
       // localStorage.removeItem("JWT_TOKEN")
       // localStorage.removeItem("USER")
       // localStorage.removeItem("IS_ADMIN")
@@ -82,7 +82,7 @@ api.interceptors.response.use(
       console.log("User account is disabled")
       localStorage.removeItem("JWT_TOKEN")
       localStorage.removeItem("USER")
-      localStorage.removeItem("CSRF_DATA")
+      localStorage.removeItem("CSRF_TOKEN")
       localStorage.removeItem("IS_ADMIN")
       window.location.href = "/login?disabled=true"
     }
