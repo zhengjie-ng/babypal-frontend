@@ -44,6 +44,7 @@ import { FaBaby } from "react-icons/fa"
 // import type { ComponentProps } from "react"
 import AuthContext from "@/context/AuthContext"
 import { useNavigate, Outlet, useLocation } from "react-router-dom"
+import { ThemeToggle } from "./theme-toggle"
 
 // User Menu Component
 const UserMenu = ({
@@ -306,7 +307,9 @@ export const Navbar05 = React.forwardRef<HTMLElement, Navbar05Props>(
             </div>
             {/* Right side */}
             <div className="flex items-center gap-4">
-              <div className="flex items-center gap-2"></div>
+              <div className="flex items-center gap-2">
+                <ThemeToggle />
+              </div>
               {/* User menu */}
               <UserMenu
                 username={

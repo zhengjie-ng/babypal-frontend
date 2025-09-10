@@ -98,13 +98,13 @@ export function CardGrowthGuide() {
       <CardContent className="space-y-5 pt-0">
         <div>
           <h4 className="text-sm font-semibold text-muted-foreground mb-2 flex items-center">
-            <span className="w-2 h-2 rounded-full bg-blue-500 mr-2"></span>
+            <span className="w-2 h-2 rounded-full bg-blue-500 dark:bg-blue-400 mr-2"></span>
             Physical Development
           </h4>
           <ul className="space-y-2 ml-4">
             {growthGuide.physicalDevelopment.map((item, index) => (
-              <li key={index} className="text-sm text-gray-700 flex items-start gap-2">
-                <span className="text-blue-500 mt-1.5 size-1.5 rounded-full bg-current flex-shrink-0" />
+              <li key={index} className="text-sm text-foreground flex items-start gap-2">
+                <span className="text-blue-500 dark:text-blue-400 mt-1.5 size-1.5 rounded-full bg-current flex-shrink-0" />
                 {item}
               </li>
             ))}
@@ -113,13 +113,13 @@ export function CardGrowthGuide() {
 
         <div>
           <h4 className="text-sm font-semibold text-muted-foreground mb-2 flex items-center">
-            <span className="w-2 h-2 rounded-full bg-green-500 mr-2"></span>
+            <span className="w-2 h-2 rounded-full bg-green-500 dark:bg-green-400 mr-2"></span>
             Cognitive & Social
           </h4>
           <ul className="space-y-2 ml-4">
             {growthGuide.cognitiveSocial.map((item, index) => (
-              <li key={index} className="text-sm text-gray-700 flex items-start gap-2">
-                <span className="text-green-500 mt-1.5 size-1.5 rounded-full bg-current flex-shrink-0" />
+              <li key={index} className="text-sm text-foreground flex items-start gap-2">
+                <span className="text-green-500 dark:text-green-400 mt-1.5 size-1.5 rounded-full bg-current flex-shrink-0" />
                 {item}
               </li>
             ))}
@@ -128,13 +128,13 @@ export function CardGrowthGuide() {
 
         <div>
           <h4 className="text-sm font-semibold text-muted-foreground mb-2 flex items-center">
-            <span className="w-2 h-2 rounded-full bg-purple-500 mr-2"></span>
+            <span className="w-2 h-2 rounded-full bg-purple-500 dark:bg-purple-400 mr-2"></span>
             Motor Skills
           </h4>
           <ul className="space-y-2 ml-4">
             {growthGuide.motorSkills.map((item, index) => (
-              <li key={index} className="text-sm text-gray-700 flex items-start gap-2">
-                <span className="text-purple-500 mt-1.5 size-1.5 rounded-full bg-current flex-shrink-0" />
+              <li key={index} className="text-sm text-foreground flex items-start gap-2">
+                <span className="text-purple-500 dark:text-purple-400 mt-1.5 size-1.5 rounded-full bg-current flex-shrink-0" />
                 {item}
               </li>
             ))}

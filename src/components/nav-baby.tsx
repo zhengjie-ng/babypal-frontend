@@ -29,7 +29,7 @@ function NavBaby() {
                   className={cn(
                     "transition-colors",
                     babyCtx?.currentBaby?.id === baby.id
-                      ? "bg-primary text-primary-foreground"
+                      ? ""
                       : "hover:bg-primary/10 hover:text-primary",
                     (babyCtx.loading || authCtx?.loading) && "opacity-50 cursor-not-allowed"
                   )}
