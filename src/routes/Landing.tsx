@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom"
 import { Button } from "@/components/ui/button"
 import { FaBaby, FaRuler, FaWeight, FaChartLine } from "react-icons/fa"
 import { motion } from "framer-motion"
+import { ThemeToggle } from "@/components/theme-toggle"
 
 const fadeIn = {
   hidden: { opacity: 0, y: 20 },
@@ -30,7 +31,7 @@ const features = [
 function Landing() {
   const navigate = useNavigate()
   return (
-    <div className="min-h-svh bg-gradient-to-b from-white to-gray-100">
+    <div className="min-h-svh bg-gradient-to-b from-white to-gray-100 dark:from-gray-900 dark:to-gray-800">
       <div className="mx-auto max-w-6xl px-4 py-12">
         <motion.div
           initial="hidden"
@@ -47,12 +48,7 @@ function Landing() {
             </div>
             BabyPal
           </a>
-          {/* <div className="flex gap-4">
-            <Button variant="ghost" onClick={() => navigate("/login")}>
-              Login
-            </Button>
-            <Button onClick={() => navigate("/signup")}>Sign Up</Button>
-          </div> */}
+          <ThemeToggle />
         </motion.div>
 
         <div className="mt-24 flex flex-col items-center text-center">
