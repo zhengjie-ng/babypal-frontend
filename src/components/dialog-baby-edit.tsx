@@ -2,7 +2,6 @@ import { Button } from "@/components/ui/button"
 import { Calendar } from "@/components/ui/calendar"
 import {
   Dialog,
-  DialogClose,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -27,7 +26,7 @@ import {
 import { cn } from "@/lib/utils"
 import { CalendarIcon, X, PlusCircle } from "lucide-react"
 import { format } from "date-fns"
-import { useContext, useState, useRef } from "react"
+import { useContext, useState } from "react"
 import BabyContext from "@/context/BabyContext"
 import AuthContext from "@/context/AuthContext"
 import { useForm } from "react-hook-form"
@@ -35,7 +34,6 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
 import { toast } from "sonner"
 import { AiOutlineEdit } from "react-icons/ai"
-import { useEffect } from "react"
 
 const formSchema = z.object({
   name: z
@@ -59,7 +57,6 @@ export function DialogBabyEdit() {
   const [caregivers, setCaregivers] = useState<string[]>([])
   const [date, setDate] = useState<Date | undefined>(undefined)
   const [isOpen, setIsOpen] = useState(false)
-  const dialogCloseRef = useRef<HTMLButtonElement>(null)
 
   const form = useForm<FormData>({
     mode: "onBlur",
