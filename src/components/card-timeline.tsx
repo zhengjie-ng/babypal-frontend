@@ -29,6 +29,8 @@ import {
   Ruler,
   ChevronLeft,
   ChevronRight,
+  Trash2,
+  Stethoscope,
 } from "lucide-react"
 
 interface TimelineItem {
@@ -72,15 +74,67 @@ interface RecordContextType {
   lastUpdate: number
 }
 
+// Helper function to detect activity type from note keywords
+const detectActivityFromNote = (note: string | null): string => {
+  if (!note) return "activity"
+  
+  const normalizedNote = note.toLowerCase()
+  
+  // Check for play-related keywords
+  if (normalizedNote.includes("play") || normalizedNote.includes("tummy") || 
+      normalizedNote.includes("activity") || normalizedNote.includes("game")) {
+    return "play"
+  }
+  
+  // Check for bath-related keywords
+  if (normalizedNote.includes("bath") || normalizedNote.includes("shower") || 
+      normalizedNote.includes("wash") || normalizedNote.includes("clean")) {
+    return "bath"
+  }
+  
+  // Check for temperature-related keywords
+  if (normalizedNote.includes("temperature") || normalizedNote.includes("fever") || 
+      normalizedNote.includes("temp") || normalizedNote.includes("hot") || 
+      normalizedNote.includes("cold")) {
+    return "temperature"
+  }
+  
+  // Check for weight-related keywords
+  if (normalizedNote.includes("weight") || normalizedNote.includes("weigh") || 
+      normalizedNote.includes("scale") || normalizedNote.includes("kg") || 
+      normalizedNote.includes("lb")) {
+    return "weight"
+  }
+  
+  // Check for height-related keywords
+  if (normalizedNote.includes("height") || normalizedNote.includes("length") || 
+      normalizedNote.includes("measure") || normalizedNote.includes("cm") || 
+      normalizedNote.includes("inch")) {
+    return "height"
+  }
+  
+  // Check for medical-related keywords
+  if (normalizedNote.includes("doctor") || normalizedNote.includes("medicine") || 
+      normalizedNote.includes("medication") || normalizedNote.includes("checkup") || 
+      normalizedNote.includes("visit")) {
+    return "medical"
+  }
+  
+  return "activity"
+}
+
 // Helper function to get icon and color for different record types
-const getRecordTypeInfo = (type: string) => {
+const getRecordTypeInfo = (type: string, note?: string | null) => {
   const normalizedType = type.toLowerCase()
+
+  // Handle "others" type by analyzing the note
+  if (normalizedType === "others" || normalizedType === "other") {
+    const detectedType = detectActivityFromNote(note || null)
+    return getRecordTypeInfo(detectedType)
+  }
 
   switch (normalizedType) {
     case "feeding":
-    case "feed":
-    case "milk":
-    case "bottle":
       return {
         icon: Utensils,
         color: "bg-green-500",
@@ -89,8 +143,6 @@ const getRecordTypeInfo = (type: string) => {
         borderColor: "border-green-200",
       }
     case "sleep":
-    case "nap":
-    case "bedtime":
       return {
         icon: Moon,
         color: "bg-blue-500",
@@ -98,20 +150,15 @@ const getRecordTypeInfo = (type: string) => {
         textColor: "text-blue-700",
         borderColor: "border-blue-200",
       }
-    case "diaper":
-    case "change":
-    case "wet":
-    case "dirty":
+    case "diaper change":
       return {
-        icon: Baby,
+        icon: Trash2,
         color: "bg-yellow-500",
         bgColor: "bg-yellow-50",
         textColor: "text-yellow-700",
         borderColor: "border-yellow-200",
       }
     case "bath":
-    case "bathing":
-    case "shower":
       return {
         icon: Bath,
         color: "bg-cyan-500",
@@ -120,8 +167,6 @@ const getRecordTypeInfo = (type: string) => {
         borderColor: "border-cyan-200",
       }
     case "temperature":
-    case "fever":
-    case "temp":
       return {
         icon: Thermometer,
         color: "bg-red-500",
@@ -130,7 +175,6 @@ const getRecordTypeInfo = (type: string) => {
         borderColor: "border-red-200",
       }
     case "weight":
-    case "weigh":
       return {
         icon: Scale,
         color: "bg-purple-500",
@@ -139,8 +183,6 @@ const getRecordTypeInfo = (type: string) => {
         borderColor: "border-purple-200",
       }
     case "height":
-    case "length":
-    case "measure":
       return {
         icon: Ruler,
         color: "bg-indigo-500",
@@ -149,8 +191,6 @@ const getRecordTypeInfo = (type: string) => {
         borderColor: "border-indigo-200",
       }
     case "play":
-    case "activity":
-    case "tummy":
       return {
         icon: Heart,
         color: "bg-pink-500",
@@ -158,6 +198,15 @@ const getRecordTypeInfo = (type: string) => {
         textColor: "text-pink-700",
         borderColor: "border-pink-200",
       }
+    case "medical":
+      return {
+        icon: Stethoscope,
+        color: "bg-red-500",
+        bgColor: "bg-red-50",
+        textColor: "text-red-700",
+        borderColor: "border-red-200",
+      }
+    case "activity":
     default:
       return {
         icon: Activity,
@@ -356,7 +405,13 @@ export const CardTimeline = () => {
 
                       <div className="space-y-4">
                         {items.map((item, index) => {
-                          const typeInfo = getRecordTypeInfo(item.title)
+                          // Find the original record to get the main type and note
+                          const originalRecord = currentBaby?.records?.find(
+                            (record) => record.id === item.id
+                          )
+                          const mainType =
+                            originalRecord?.type || item.title.split(" - ")[0]
+                          const typeInfo = getRecordTypeInfo(mainType, originalRecord?.note)
                           const Icon = typeInfo.icon
 
                           return (

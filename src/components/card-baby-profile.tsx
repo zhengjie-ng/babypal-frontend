@@ -36,7 +36,7 @@ export function CardBabyProfile() {
   }
 
   return (
-    <Card className="h-150 w-220 max-w-md">
+    <Card className="w-full">
       <CardHeader className="text-center">
         <div className="bg-primary/10 mx-auto mb-4 rounded-full p-4">
           <TbMoodKid className="text-primary size-24" />

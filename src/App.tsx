@@ -7,10 +7,12 @@ import Home from "./routes/Home"
 import Measurements from "./routes/Measurements"
 import Dashboard from "./routes/Dashboard"
 import Admin from "./routes/Admin"
+import DevelopmentalMilestones from "./routes/DevelopmentalMilestones"
 import PageNotFound from "./routes/PageNotFound"
 import { AuthProvider } from "./context/AuthContext"
 import { BabyProvider } from "./context/BabyContext"
 import { AdminProvider } from "./context/AdminContext"
+import { GrowthGuideProvider } from "./context/GrowthGuideContext"
 import { Navbar05 } from "@/components/nav-bar"
 import NavBaby from "./components/nav-baby"
 import { RecordProvider } from "./context/RecordContext"
@@ -25,8 +27,9 @@ function App() {
         <AuthProvider>
           <AdminProvider>
             <BabyProvider>
-              <RecordProvider>
-                <MeasurementProvider>
+              <GrowthGuideProvider>
+                <RecordProvider>
+                  <MeasurementProvider>
                   <Toaster position="bottom-center" />
                   <Routes>
                     <Route path="/" element={<Landing />} />
@@ -39,13 +42,15 @@ function App() {
                         <Route path="/home" element={<Home />} />
                         <Route path="/dashboard" element={<Dashboard />} />
                         <Route path="/measurements" element={<Measurements />} />
+                        <Route path="/milestones" element={<DevelopmentalMilestones />} />
                       </Route>
                       <Route path="/admin" element={<Admin />} />
                       <Route path="/*" element={<PageNotFound />} />
                     </Route>
                   </Routes>
-                </MeasurementProvider>
-              </RecordProvider>
+                  </MeasurementProvider>
+                </RecordProvider>
+              </GrowthGuideProvider>
             </BabyProvider>
           </AdminProvider>
         </AuthProvider>

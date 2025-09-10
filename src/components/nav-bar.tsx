@@ -120,6 +120,7 @@ const baseNavigationLinks: Navbar05NavItem[] = [
   { href: "/home", label: "Home" },
   { href: "/dashboard", label: "Dashboard" },
   { href: "/measurements", label: "Measurements" },
+  { href: "/milestones", label: "Developmental Milestones" },
 ]
 
 const adminNavigationLink: Navbar05NavItem = { href: "/admin", label: "Admin" }
