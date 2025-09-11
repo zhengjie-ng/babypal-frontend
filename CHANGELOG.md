@@ -1,3 +1,10 @@
+# [1.2.0](https://github.com/zhengjie-ng/babypal-frontend/compare/v1.1.0...v1.2.0) (2025-09-11)
+
+
+### Features
+
+* admin is able to see log in Admin page ([4451024](https://github.com/zhengjie-ng/babypal-frontend/commit/4451024b7defb0abb8b9d3ec4af84df8dc27b276))
+
 # [1.1.0](https://github.com/zhengjie-ng/babypal-frontend/compare/v1.0.0...v1.1.0) (2025-09-11)
 
 
