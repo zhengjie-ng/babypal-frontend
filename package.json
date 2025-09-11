@@ -8,7 +8,8 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "test": "vitest"
+    "test": "vitest",
+    "semantic-release": "semantic-release"
   },
   "dependencies": {
     "@fontsource/poppins": "^5.2.6",
@@ -53,6 +54,8 @@
     "@emnapi/wasi-threads": "^1.1.0",
     "@eslint/js": "^9.33.0",
     "@napi-rs/wasm-runtime": "^0.2.12",
+    "@semantic-release/changelog": "^6.0.3",
+    "@semantic-release/git": "^10.0.1",
     "@testing-library/jest-dom": "^6.8.0",
     "@testing-library/react": "^16.3.0",
     "@tybys/wasm-util": "^0.10.0",
@@ -68,6 +71,7 @@
     "netlify-cli": "^23.5.0",
     "prettier": "^3.6.2",
     "prettier-plugin-tailwindcss": "^0.6.14",
+    "semantic-release": "^24.2.8",
     "tw-animate-css": "^1.3.7",
     "typescript": "~5.8.3",
     "typescript-eslint": "^8.39.1",
@@ -75,5 +79,22 @@
     "vite-plugin-svgr": "^4.5.0",
     "vite-tsconfig-paths": "^5.1.4",
     "vitest": "^3.2.4"
+  },
+  "release": {
+    "branches": [
+      "main",
+      "release"
+    ],
+    "plugins": [
+      "@semantic-release/commit-analyzer",
+      "@semantic-release/release-notes-generator",
+      "@semantic-release/changelog",
+      "@semantic-release/npm",
+      "@semantic-release/git"
+    ]
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/zhengjie-ng/babypal-frontend"
   }
 }
