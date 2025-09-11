@@ -19,6 +19,7 @@ import { RecordProvider } from "./context/RecordContext"
 import { MeasurementProvider } from "./context/MeasurementContext"
 import ForgotPassword from "./routes/ForgotPassword"
 import ResetPassword from "./routes/ResetPassword"
+import Profile from "./routes/Profile"
 
 function App() {
   return (
@@ -30,24 +31,37 @@ function App() {
               <GrowthGuideProvider>
                 <RecordProvider>
                   <MeasurementProvider>
-                  <Toaster position="bottom-center" />
-                  <Routes>
-                    <Route path="/" element={<Landing />} />
-                    <Route path="/login" element={<Login />} />
-                    <Route path="/signup" element={<Signup />} />
-                    <Route path="/forgot-password" element={<ForgotPassword />} />
-                    <Route path="/reset-password" element={<ResetPassword />} />
-                    <Route path="/" element={<Navbar05 />}>
-                      <Route path="/" element={<NavBaby />}>
-                        <Route path="/home" element={<Home />} />
-                        <Route path="/dashboard" element={<Dashboard />} />
-                        <Route path="/measurements" element={<Measurements />} />
-                        <Route path="/milestones" element={<DevelopmentalMilestones />} />
+                    <Toaster position="bottom-center" />
+                    <Routes>
+                      <Route path="/" element={<Landing />} />
+                      <Route path="/login" element={<Login />} />
+                      <Route path="/signup" element={<Signup />} />
+                      <Route
+                        path="/forgot-password"
+                        element={<ForgotPassword />}
+                      />
+                      <Route
+                        path="/reset-password"
+                        element={<ResetPassword />}
+                      />
+                      <Route path="/" element={<Navbar05 />}>
+                        <Route path="/" element={<NavBaby />}>
+                          <Route path="/profile" element={<Profile />} />
+                          <Route path="/home" element={<Home />} />
+                          <Route path="/dashboard" element={<Dashboard />} />
+                          <Route
+                            path="/measurements"
+                            element={<Measurements />}
+                          />
+                          <Route
+                            path="/milestones"
+                            element={<DevelopmentalMilestones />}
+                          />
+                        </Route>
+                        <Route path="/admin" element={<Admin />} />
+                        <Route path="/*" element={<PageNotFound />} />
                       </Route>
-                      <Route path="/admin" element={<Admin />} />
-                      <Route path="/*" element={<PageNotFound />} />
-                    </Route>
-                  </Routes>
+                    </Routes>
                   </MeasurementProvider>
                 </RecordProvider>
               </GrowthGuideProvider>

@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { useContext, useState } from "react"
 import {
   Table,
@@ -583,6 +582,12 @@ function Admin() {
                             Account Expiry
                           </div>
                         </TableHead>
+                        <TableHead className="text-center">
+                          <div className="flex items-center gap-1 justify-center">
+                            <ShieldCheck className="h-4 w-4" />
+                            2FA Status
+                          </div>
+                        </TableHead>
                         <TableHead className="text-center">Actions</TableHead>
                       </TableRow>
                     </TableHeader>
@@ -624,6 +629,14 @@ function Admin() {
                               {getExpiryIcon(user.accountExpiryDate)}
                               <span className="text-xs">
                                 {formatExpiryDate(user.accountExpiryDate)}
+                              </span>
+                            </div>
+                          </TableCell>
+                          <TableCell className="text-center">
+                            <div className="flex items-center justify-center gap-2">
+                              {getStatusIcon(user.twoFactorEnabled, 'enabled')}
+                              <span className="text-xs">
+                                {user.twoFactorEnabled ? 'Enabled' : 'Disabled'}
                               </span>
                             </div>
                           </TableCell>

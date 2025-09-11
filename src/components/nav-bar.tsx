@@ -69,7 +69,7 @@ const UserMenu = ({
       >
         {isLoading ? (
           <>
-            <div className="h-7 w-7 rounded-full bg-muted flex items-center justify-center">
+            <div className="bg-muted flex h-7 w-7 items-center justify-center rounded-full">
               <Loader2 className="h-4 w-4 animate-spin" />
             </div>
             <ChevronDownIcon className="ml-1 h-3 w-3" />
@@ -93,8 +93,8 @@ const UserMenu = ({
         <div className="flex flex-col space-y-1">
           {isLoading ? (
             <>
-              <div className="h-4 bg-muted rounded animate-pulse" />
-              <div className="h-3 bg-muted rounded animate-pulse w-3/4" />
+              <div className="bg-muted h-4 animate-pulse rounded" />
+              <div className="bg-muted h-3 w-3/4 animate-pulse rounded" />
             </>
           ) : (
             <>
@@ -109,6 +109,9 @@ const UserMenu = ({
         </div>
       </DropdownMenuLabel>
       <DropdownMenuSeparator />
+      <DropdownMenuItem onClick={() => onItemClick?.("profile")}>
+        Profile
+      </DropdownMenuItem>
       <DropdownMenuItem onClick={() => onItemClick?.("logout")}>
         Log out
       </DropdownMenuItem>
@@ -174,6 +177,8 @@ export const Navbar05 = React.forwardRef<HTMLElement, Navbar05Props>(
     const handleUserItemClick = (item: string) => {
       if (item === "logout" && authCtx?.onLogoutHandler) {
         authCtx.onLogoutHandler()
+      } else if (item === "profile") {
+        navigate("/profile")
       } else if (onUserItemClick) {
         onUserItemClick(item)
       }
@@ -211,7 +216,7 @@ export const Navbar05 = React.forwardRef<HTMLElement, Navbar05Props>(
         <header
           ref={combinedRef}
           className={cn(
-            "bg-background/95 supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50 w-full border-b px-2 sm:px-4 backdrop-blur md:px-6 [&_*]:no-underline",
+            "bg-background/95 supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50 w-full border-b px-2 backdrop-blur sm:px-4 md:px-6 [&_*]:no-underline",
             className
           )}
           {...props}

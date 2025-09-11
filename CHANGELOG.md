@@ -1,3 +1,11 @@
+# [1.3.0](https://github.com/zhengjie-ng/babypal-frontend/compare/v1.2.0...v1.3.0) (2025-09-11)
+
+
+### Features
+
+* Admin to be able to see user's 2FA status ([eca32b4](https://github.com/zhengjie-ng/babypal-frontend/commit/eca32b417631e91b0ac2b50669d5d0ec0c0b97d1))
+* Implement 2FA activation and signin ([ed512a2](https://github.com/zhengjie-ng/babypal-frontend/commit/ed512a21125c77749fa2affbbf5605ac6185646b))
+
 # [1.2.0](https://github.com/zhengjie-ng/babypal-frontend/compare/v1.1.0...v1.2.0) (2025-09-11)
 
 

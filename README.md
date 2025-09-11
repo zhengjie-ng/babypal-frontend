@@ -2,6 +2,12 @@
 
 A modern React application for tracking baby development, measurements, and milestones. Built with React, TypeScript, and Vite.
 
+## 🌟 Try the Live Demo
+
+**Want to try BabyPal right now?** Visit our live demo at: **[https://babypal.netlify.app/](https://babypal.netlify.app/)**
+
+No installation required - just create an account or explore the features!
+
 ## Features
 
 - 👶 Baby profile management
@@ -12,6 +18,7 @@ A modern React application for tracking baby development, measurements, and mile
 - 🌙 Dark/light theme support
 - 👨‍💼 Admin panel for user management
 - 🔐 Secure authentication with JWT
+- 🔒 Two-Factor Authentication (2FA) support
 - 📱 Responsive mobile-friendly design
 
 ## Tech Stack
@@ -119,15 +126,23 @@ src/
 - User management dashboard
 - System-wide baby and record management
 - Debug tools and analytics
+- 2FA status monitoring and management
+- User security settings control
 
-## Authentication
+## Authentication & Security
 
-The app uses JWT-based authentication with:
+The app uses JWT-based authentication with enhanced security features:
 
 - User registration and login
 - Password reset functionality
 - Secure route protection
 - Automatic token refresh
+- **Two-Factor Authentication (2FA)**
+  - TOTP-based authentication using authenticator apps
+  - QR code setup for easy configuration
+  - Admin can view user 2FA status
+  - Admin can deactivate 2FA when needed
+  - Enhanced account security
 
 ## Deployment
 
