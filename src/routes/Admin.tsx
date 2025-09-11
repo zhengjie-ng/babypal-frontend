@@ -37,6 +37,9 @@ import {
   AlertTriangle,
   Settings,
   Baby,
+  FileText,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react"
 import AdminContext from "@/context/AdminContext"
 import AuthContext from "@/context/AuthContext"
@@ -58,9 +61,17 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import { AdminDebug } from "@/components/admin-debug"
 import { AdminUserActionsDialog } from "@/components/admin-user-actions-dialog"
 import { AdminBabiesList } from "@/components/admin-babies-list"
+import { AdminLogsList } from "@/components/admin-logs-list"
 
 interface Role {
   roleId: number
@@ -102,7 +113,9 @@ function Admin() {
   const [sortDirection, setSortDirection] = useState<SortDirection>("asc")
   const [actionsDialogOpen, setActionsDialogOpen] = useState(false)
   const [actionsUser, setActionsUser] = useState<User | null>(null)
-  const [activeTab, setActiveTab] = useState<"users" | "babies">("users")
+  const [activeTab, setActiveTab] = useState<"users" | "babies" | "logs">("users")
+  const [usersPageSize, setUsersPageSize] = useState<number>(30)
+  const [usersCurrentPage, setUsersCurrentPage] = useState<number>(1)
 
   // Helper function to check if user is the currently signed-in user
   const isCurrentUser = (user: User) => {
@@ -159,6 +172,13 @@ function Admin() {
     return 0
   })
 
+  // Calculate pagination for users
+  const totalUsers = sortedUsers.length
+  const usersTotalPages = Math.ceil(totalUsers / usersPageSize)
+  const usersStartIndex = (usersCurrentPage - 1) * usersPageSize
+  const usersEndIndex = usersStartIndex + usersPageSize
+  const currentUsers = sortedUsers.slice(usersStartIndex, usersEndIndex)
+
   // Get sort icon for column header
   const getSortIcon = (field: SortField) => {
     if (sortField !== field) return <ArrowUpDown className="h-4 w-4" />
@@ -187,7 +207,7 @@ function Admin() {
     setActionsDialogOpen(true)
   }
 
-  const handleTabChange = (tab: "users" | "babies") => {
+  const handleTabChange = (tab: "users" | "babies" | "logs") => {
     setActiveTab(tab)
     
     // Auto-fetch data when switching tabs
@@ -195,6 +215,8 @@ function Admin() {
       adminCtx.fetchBabies()
     } else if (tab === "users" && adminCtx?.users.length === 0) {
       adminCtx.fetchUsers()
+    } else if (tab === "logs" && adminCtx?.logs.length === 0) {
+      adminCtx.fetchLogs()
     }
   }
 
@@ -368,6 +390,15 @@ function Admin() {
                 <Baby className="mr-2 h-4 w-4" />
                 Babies
               </Button>
+              <Button
+                variant={activeTab === "logs" ? "default" : "outline"}
+                size="sm"
+                onClick={() => handleTabChange("logs")}
+                className={activeTab === "logs" ? "dark:text-white" : ""}
+              >
+                <FileText className="mr-2 h-4 w-4" />
+                Logs
+              </Button>
             </div>
             
             {/* Refresh Button */}
@@ -375,8 +406,10 @@ function Admin() {
               onClick={() => {
                 if (activeTab === "users") {
                   adminCtx?.fetchUsers()
-                } else {
+                } else if (activeTab === "babies") {
                   adminCtx?.fetchBabies()
+                } else if (activeTab === "logs") {
+                  adminCtx?.fetchLogs()
                 }
               }}
               disabled={adminCtx?.loading}
@@ -432,6 +465,30 @@ function Admin() {
                 <CardDescription>
                   View and manage all registered users in the system
                 </CardDescription>
+                
+                {/* Users Pagination Controls */}
+                <div className="flex items-center justify-between pt-4">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-medium">Rows per page:</span>
+                    <Select value={usersPageSize.toString()} onValueChange={(value) => {
+                      setUsersPageSize(Number(value))
+                      setUsersCurrentPage(1)
+                    }}>
+                      <SelectTrigger className="w-20">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="30">30</SelectItem>
+                        <SelectItem value="100">100</SelectItem>
+                        <SelectItem value="1000">1000</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  
+                  <div className="text-sm text-muted-foreground">
+                    Showing {usersStartIndex + 1}-{Math.min(usersEndIndex, totalUsers)} of {totalUsers} users
+                  </div>
+                </div>
               </CardHeader>
               <CardContent>
                 {adminCtx?.loading ? (
@@ -530,7 +587,7 @@ function Admin() {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {sortedUsers.map((user) => (
+                      {currentUsers.map((user) => (
                         <TableRow key={user.userId}>
                           <TableCell className="text-muted-foreground font-mono text-sm">
                             {user.userId}
@@ -675,12 +732,66 @@ function Admin() {
                     </TableBody>
                   </Table>
                 )}
+                
+                {/* Users Pagination Navigation */}
+                {usersTotalPages > 1 && (
+                  <div className="flex items-center justify-between px-6 py-4 border-t">
+                    <div className="flex items-center gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setUsersCurrentPage(1)}
+                        disabled={usersCurrentPage === 1}
+                      >
+                        First
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setUsersCurrentPage(usersCurrentPage - 1)}
+                        disabled={usersCurrentPage === 1}
+                      >
+                        <ChevronLeft className="h-4 w-4" />
+                        Previous
+                      </Button>
+                    </div>
+                    
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm text-muted-foreground">
+                        Page {usersCurrentPage} of {usersTotalPages}
+                      </span>
+                    </div>
+                    
+                    <div className="flex items-center gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setUsersCurrentPage(usersCurrentPage + 1)}
+                        disabled={usersCurrentPage === usersTotalPages}
+                      >
+                        Next
+                        <ChevronRight className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setUsersCurrentPage(usersTotalPages)}
+                        disabled={usersCurrentPage === usersTotalPages}
+                      >
+                        Last
+                      </Button>
+                    </div>
+                  </div>
+                )}
               </CardContent>
             </Card>
           </>
-        ) : (
+        ) : activeTab === "babies" ? (
           /* Babies Tab Content */
           <AdminBabiesList />
+        ) : (
+          /* Logs Tab Content */
+          <AdminLogsList />
         )}
       </div>
 

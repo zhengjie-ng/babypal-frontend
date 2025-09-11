@@ -31,6 +31,8 @@ import {
   Edit,
   Trash2,
   AlertTriangle,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react"
 import AdminContext from "@/context/AdminContext"
 import { format } from "date-fns"
@@ -48,6 +50,13 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import { AdminBabyEditDialog } from "@/components/admin-baby-edit-dialog"
 
 interface Record {
@@ -101,6 +110,8 @@ export function AdminBabiesList() {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [sortField, setSortField] = useState<SortField>("id")
   const [sortDirection, setSortDirection] = useState<SortDirection>("asc")
+  const [pageSize, setPageSize] = useState<number>(30)
+  const [currentPage, setCurrentPage] = useState<number>(1)
 
   // Handle column sorting
   const handleSort = (field: SortField) => {
@@ -151,6 +162,13 @@ export function AdminBabiesList() {
     if (aValue > bValue) return sortDirection === "asc" ? 1 : -1
     return 0
   })
+
+  // Calculate pagination
+  const totalBabies = sortedBabies.length
+  const totalPages = Math.ceil(totalBabies / pageSize)
+  const startIndex = (currentPage - 1) * pageSize
+  const endIndex = startIndex + pageSize
+  const currentBabies = sortedBabies.slice(startIndex, endIndex)
 
   // Get sort icon for column header
   const getSortIcon = (field: SortField) => {
@@ -300,6 +318,30 @@ export function AdminBabiesList() {
           <CardDescription>
             View all babies registered in the system
           </CardDescription>
+          
+          {/* Pagination Controls */}
+          <div className="flex items-center justify-between pt-4">
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-medium">Rows per page:</span>
+              <Select value={pageSize.toString()} onValueChange={(value) => {
+                setPageSize(Number(value))
+                setCurrentPage(1)
+              }}>
+                <SelectTrigger className="w-20">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="30">30</SelectItem>
+                  <SelectItem value="100">100</SelectItem>
+                  <SelectItem value="1000">1000</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div className="text-sm text-muted-foreground">
+              Showing {startIndex + 1}-{Math.min(endIndex, totalBabies)} of {totalBabies} babies
+            </div>
+          </div>
         </CardHeader>
         <CardContent>
           {adminCtx?.loading ? (
@@ -389,7 +431,7 @@ export function AdminBabiesList() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {sortedBabies.map((baby) => (
+                {currentBabies.map((baby) => (
                   <TableRow key={baby.id}>
                     <TableCell className="text-muted-foreground font-mono text-sm">
                       {baby.id}
@@ -495,6 +537,57 @@ export function AdminBabiesList() {
                 ))}
               </TableBody>
             </Table>
+          )}
+          
+          {/* Pagination Navigation */}
+          {totalPages > 1 && (
+            <div className="flex items-center justify-between px-6 py-4 border-t">
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setCurrentPage(1)}
+                  disabled={currentPage === 1}
+                >
+                  First
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setCurrentPage(currentPage - 1)}
+                  disabled={currentPage === 1}
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                  Previous
+                </Button>
+              </div>
+              
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-muted-foreground">
+                  Page {currentPage} of {totalPages}
+                </span>
+              </div>
+              
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setCurrentPage(currentPage + 1)}
+                  disabled={currentPage === totalPages}
+                >
+                  Next
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setCurrentPage(totalPages)}
+                  disabled={currentPage === totalPages}
+                >
+                  Last
+                </Button>
+              </div>
+            </div>
           )}
         </CardContent>
       </Card>
