@@ -102,6 +102,7 @@ interface AdminContextType {
   updateUserEmail: (userId: number, email: string) => Promise<void>
   updateAccountExpiryDate: (userId: number, expiryDate: string | null) => Promise<void>
   updateCredentialsExpiryDate: (userId: number, expiryDate: string | null) => Promise<void>
+  deactivateTwoFactor: (userId: number) => Promise<void>
   updateBaby: (babyId: number, babyData: Partial<Baby>) => Promise<void>
   deleteBaby: (babyId: number) => Promise<void>
 }
@@ -555,6 +556,37 @@ export function AdminProvider({ children }: { children: ReactNode }) {
     []
   )
 
+  const deactivateTwoFactor = useCallback(
+    async (userId: number) => {
+      try {
+        await api.put(`/admin/deactivate-2fa?userId=${userId}`)
+        
+        // Update local state
+        setUsers((prevUsers) =>
+          prevUsers.map((user) =>
+            user.userId === userId 
+              ? { 
+                  ...user, 
+                  twoFactorEnabled: false,
+                  twoFactorSecret: null 
+                } 
+              : user
+          ).sort((a, b) => a.userId - b.userId)
+        )
+        
+        toast.success("Two-Factor Authentication deactivated successfully")
+      } catch (err) {
+        const errorMessage =
+          err instanceof Error
+            ? err.message
+            : (err as { response?: { data?: { message?: string } } })?.response
+                ?.data?.message || "Error deactivating 2FA"
+        toast.error(errorMessage)
+      }
+    },
+    []
+  )
+
   const updateBaby = useCallback(
     async (babyId: number, babyData: Partial<Baby>) => {
       try {
@@ -629,6 +661,7 @@ export function AdminProvider({ children }: { children: ReactNode }) {
     updateUserEmail,
     updateAccountExpiryDate,
     updateCredentialsExpiryDate,
+    deactivateTwoFactor,
     updateBaby,
     deleteBaby,
   }

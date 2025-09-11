@@ -10,7 +10,9 @@ import {
   Eye,
   EyeOff,
   Mail,
-  CalendarIcon
+  CalendarIcon,
+  ShieldCheck,
+  ChevronDown
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
@@ -24,8 +26,11 @@ import {
 // Tabs component not available - using simple sections instead
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Badge } from "@/components/ui/badge"
-import { Separator } from "@/components/ui/separator"
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible"
 import { Calendar } from "@/components/ui/calendar"
 import {
   Popover,
@@ -86,11 +91,6 @@ export function AdminUserActionsDialog({
   const [accountExpiryDate, setAccountExpiryDate] = useState<Date | undefined>()
   const [credentialsExpiryDate, setCredentialsExpiryDate] = useState<Date | undefined>()
 
-  if (!adminCtx) {
-    console.error('AdminUserActionsDialog must be used within AdminProvider')
-    return null
-  }
-
   // Initialize state when user changes
   useEffect(() => {
     if (user) {
@@ -121,6 +121,11 @@ export function AdminUserActionsDialog({
       }
     }
   }, [user])
+
+  if (!adminCtx) {
+    console.error('AdminUserActionsDialog must be used within AdminProvider')
+    return null
+  }
 
   if (!user) return null
 
@@ -176,11 +181,6 @@ export function AdminUserActionsDialog({
     }
   }
 
-  const getStatusBadge = (status: boolean, positiveText: string, negativeText: string) => (
-    <Badge variant={status ? "default" : "destructive"} className={status ? "bg-green-100 text-green-800" : ""}>
-      {status ? positiveText : negativeText}
-    </Badge>
-  )
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -195,392 +195,340 @@ export function AdminUserActionsDialog({
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-6">
-          {/* Email Section */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Left Column - Basic Actions */}
           <div className="space-y-4">
-            <div className="flex items-center gap-2">
-              <Mail className="h-4 w-4 text-blue-600" />
-              <Label className="text-base font-medium">Update Email Address</Label>
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="newEmail">Email Address</Label>
+            {/* Email Update */}
+            <div className="space-y-3 p-4 border rounded-lg">
+              <div className="flex items-center gap-2">
+                <Mail className="h-4 w-4 text-blue-600" />
+                <Label className="font-medium">Email Address</Label>
+              </div>
               <Input
-                id="newEmail"
                 type="email"
                 placeholder="Enter new email address"
                 value={newEmail}
                 onChange={(e) => setNewEmail(e.target.value)}
               />
-            </div>
-
-            <AlertDialog>
-              <AlertDialogTrigger asChild>
-                <Button 
-                  disabled={!newEmail.trim() || newEmail === user.email || isUpdating} 
-                  className="w-full"
-                >
-                  <Mail className="mr-2 h-4 w-4" />
-                  Update Email
-                </Button>
-              </AlertDialogTrigger>
-              <AlertDialogContent>
-                <AlertDialogHeader>
-                  <AlertDialogTitle>Confirm Email Update</AlertDialogTitle>
-                  <AlertDialogDescription>
-                    Are you sure you want to update the email address for user "{user.userName}" 
-                    from "{user.email}" to "{newEmail}"?
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel>Cancel</AlertDialogCancel>
-                  <AlertDialogAction onClick={handleEmailUpdate}>
-                    Update Email
-                  </AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
-          </div>
-          
-          <Separator />
-          
-          {/* Password Section */}
-          <div className="space-y-4">
-            <div className="space-y-4">
-              <div className="flex items-center gap-2">
-                <Key className="h-4 w-4 text-blue-600" />
-                <Label className="text-base font-medium">Reset User Password</Label>
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="newPassword">New Password</Label>
-                <div className="relative">
-                  <Input
-                    id="newPassword"
-                    type={showPassword ? "text" : "password"}
-                    placeholder="Enter new password"
-                    value={newPassword}
-                    onChange={(e) => setNewPassword(e.target.value)}
-                    className="pr-10"
-                  />
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    className="absolute right-0 top-0 h-full px-3"
-                    onClick={() => setShowPassword(!showPassword)}
-                  >
-                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                  </Button>
-                </div>
-              </div>
-
               <AlertDialog>
                 <AlertDialogTrigger asChild>
                   <Button 
+                    size="sm"
+                    disabled={!newEmail.trim() || newEmail === user.email || isUpdating} 
+                    className="w-full"
+                  >
+                    Update Email
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Confirm Email Update</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      Update email for "{user.userName}" from "{user.email}" to "{newEmail}"?
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction onClick={handleEmailUpdate}>Update</AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            </div>
+
+            {/* Password Reset */}
+            <div className="space-y-3 p-4 border rounded-lg">
+              <div className="flex items-center gap-2">
+                <Key className="h-4 w-4 text-orange-600" />
+                <Label className="font-medium">Reset Password</Label>
+              </div>
+              <div className="relative">
+                <Input
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Enter new password"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  className="pr-10"
+                />
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className="absolute right-0 top-0 h-full px-3"
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </Button>
+              </div>
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button 
+                    size="sm"
                     disabled={!newPassword.trim() || isUpdating} 
                     className="w-full"
                   >
-                    <Key className="mr-2 h-4 w-4" />
-                    Update Password
+                    Reset Password
                   </Button>
                 </AlertDialogTrigger>
                 <AlertDialogContent>
                   <AlertDialogHeader>
                     <AlertDialogTitle>Confirm Password Reset</AlertDialogTitle>
                     <AlertDialogDescription>
-                      Are you sure you want to reset the password for user "{user.userName}"? 
-                      This action will immediately change their login credentials.
+                      Reset password for "{user.userName}"? This will immediately change their login credentials.
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <AlertDialogFooter>
                     <AlertDialogCancel>Cancel</AlertDialogCancel>
-                    <AlertDialogAction onClick={handlePasswordUpdate}>
-                      Reset Password
-                    </AlertDialogAction>
+                    <AlertDialogAction onClick={handlePasswordUpdate}>Reset</AlertDialogAction>
                   </AlertDialogFooter>
                 </AlertDialogContent>
               </AlertDialog>
             </div>
           </div>
-          
-          <Separator />
-          
-          {/* Security Section */}
-          <div className="space-y-4">
-            <div className="space-y-4">
-              <div className="flex items-center gap-2">
-                <Shield className="h-4 w-4 text-orange-600" />
-                <Label className="text-base font-medium">Account Security</Label>
-              </div>
-              
-              <div className="grid gap-4">
-                <div className="flex items-center justify-between p-4 border rounded-lg">
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-2">
-                      {user.accountNonLocked ? <Unlock className="h-4 w-4 text-green-600" /> : <Lock className="h-4 w-4 text-red-600" />}
-                      <span className="font-medium">Account Lock Status</span>
-                    </div>
-                    <p className="text-sm text-muted-foreground">
-                      {user.accountNonLocked ? "Account is unlocked" : "Account is locked"}
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    {getStatusBadge(user.accountNonLocked, "Unlocked", "Locked")}
-                    <AlertDialog>
-                      <AlertDialogTrigger asChild>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          disabled={isUpdating}
-                        >
-                          {user.accountNonLocked ? <Lock className="h-4 w-4" /> : <Unlock className="h-4 w-4" />}
-                          {user.accountNonLocked ? "Lock" : "Unlock"}
-                        </Button>
-                      </AlertDialogTrigger>
-                      <AlertDialogContent>
-                        <AlertDialogHeader>
-                          <AlertDialogTitle>
-                            {user.accountNonLocked ? "Lock Account" : "Unlock Account"}
-                          </AlertDialogTitle>
-                          <AlertDialogDescription>
-                            {user.accountNonLocked 
-                              ? `Are you sure you want to lock the account for "${user.userName}"? They won't be able to log in until unlocked.`
-                              : `Are you sure you want to unlock the account for "${user.userName}"? They will regain login access.`
-                            }
-                          </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                          <AlertDialogCancel>Cancel</AlertDialogCancel>
-                          <AlertDialogAction onClick={() => handleStatusToggle('lock')}>
-                            {user.accountNonLocked ? "Lock Account" : "Unlock Account"}
-                          </AlertDialogAction>
-                        </AlertDialogFooter>
-                      </AlertDialogContent>
-                    </AlertDialog>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          
-          <Separator />
-          
-          {/* Account Status Section */}
-          <div className="space-y-4">
-            <div className="space-y-4">
-              <div className="flex items-center gap-2">
-                <Clock className="h-4 w-4 text-purple-600" />
-                <Label className="text-base font-medium">Expiry Status</Label>
-              </div>
-              
-              <div className="grid gap-4">
-                <div className="p-4 border rounded-lg space-y-4">
-                  <div className="flex items-center justify-between">
-                    <div className="space-y-1">
-                      <div className="flex items-center gap-2">
-                        {user.accountNonExpired ? <Clock className="h-4 w-4 text-green-600" /> : <XCircle className="h-4 w-4 text-red-600" />}
-                        <span className="font-medium">Account Expiry</span>
-                      </div>
-                      <p className="text-sm text-muted-foreground">
-                        {user.accountNonExpired ? "Account is valid" : "Account has expired"}
-                      </p>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      {getStatusBadge(user.accountNonExpired, "Valid", "Expired")}
-                      <AlertDialog>
-                        <AlertDialogTrigger asChild>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            disabled={isUpdating}
-                          >
-                            {user.accountNonExpired ? <XCircle className="h-4 w-4" /> : <Clock className="h-4 w-4" />}
-                            {user.accountNonExpired ? "Expire" : "Activate"}
-                          </Button>
-                        </AlertDialogTrigger>
-                        <AlertDialogContent>
-                          <AlertDialogHeader>
-                            <AlertDialogTitle>
-                              {user.accountNonExpired ? "Expire Account" : "Activate Account"}
-                            </AlertDialogTitle>
-                            <AlertDialogDescription>
-                              {user.accountNonExpired 
-                                ? `Are you sure you want to expire the account for "${user.userName}"?`
-                                : `Are you sure you want to activate the account for "${user.userName}"?`
-                              }
-                            </AlertDialogDescription>
-                          </AlertDialogHeader>
-                          <AlertDialogFooter>
-                            <AlertDialogCancel>Cancel</AlertDialogCancel>
-                            <AlertDialogAction onClick={() => handleStatusToggle('accountExpiry')}>
-                              {user.accountNonExpired ? "Expire Account" : "Activate Account"}
-                            </AlertDialogAction>
-                          </AlertDialogFooter>
-                        </AlertDialogContent>
-                      </AlertDialog>
-                    </div>
-                  </div>
-                  
-                  {/* Account Expiry Date Picker */}
-                  <div className="space-y-2">
-                    <Label className="text-sm font-medium">Account Expiry Date</Label>
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <Button
-                          variant="outline"
-                          className="w-full justify-start text-left font-normal"
-                          disabled={isUpdating}
-                        >
-                          <CalendarIcon className="mr-2 h-4 w-4" />
-                          {accountExpiryDate ? format(accountExpiryDate, "PPP") : 
-                            user.accountExpiryDate ? format(new Date(user.accountExpiryDate), "PPP") : 
-                            <span className="text-muted-foreground">No expiry date set</span>}
-                        </Button>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0" align="start">
-                        <div className="p-0">
-                          <Calendar
-                            mode="single"
-                            selected={accountExpiryDate}
-                            onSelect={(date) => {
-                              setAccountExpiryDate(date)
-                              if (date) {
-                                // Auto-update when date is selected
-                                const dateString = format(date, "yyyy-MM-dd")
-                                adminCtx.updateAccountExpiryDate(user.userId, dateString)
-                              }
-                            }}
-                            initialFocus
-                          />
-                          {(accountExpiryDate || user.accountExpiryDate) && (
-                            <div className="p-3 border-t">
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                className="w-full"
-                                onClick={() => {
-                                  setAccountExpiryDate(undefined)
-                                  // Clear the expiry date by setting it to null
-                                  adminCtx.updateAccountExpiryDate(user.userId, null)
-                                }}
-                              >
-                                Remove Expiry Date
-                              </Button>
-                            </div>
-                          )}
-                        </div>
-                      </PopoverContent>
-                    </Popover>
-                  </div>
-                </div>
 
-                <div className="p-4 border rounded-lg space-y-4">
-                  <div className="flex items-center justify-between">
-                    <div className="space-y-1">
-                      <div className="flex items-center gap-2">
-                        {user.credentialsNonExpired ? <Shield className="h-4 w-4 text-green-600" /> : <XCircle className="h-4 w-4 text-red-600" />}
-                        <span className="font-medium">Credentials Expiry</span>
-                      </div>
-                      <p className="text-sm text-muted-foreground">
-                        {user.credentialsNonExpired ? "Credentials are valid" : "Credentials have expired"}
-                      </p>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      {getStatusBadge(user.credentialsNonExpired, "Valid", "Expired")}
-                      <AlertDialog>
-                        <AlertDialogTrigger asChild>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            disabled={isUpdating}
-                          >
-                            {user.credentialsNonExpired ? <XCircle className="h-4 w-4" /> : <Shield className="h-4 w-4" />}
-                            {user.credentialsNonExpired ? "Expire" : "Activate"}
-                          </Button>
-                        </AlertDialogTrigger>
-                        <AlertDialogContent>
-                          <AlertDialogHeader>
-                            <AlertDialogTitle>
-                              {user.credentialsNonExpired ? "Expire Credentials" : "Activate Credentials"}
-                            </AlertDialogTitle>
-                            <AlertDialogDescription>
-                              {user.credentialsNonExpired 
-                                ? `Are you sure you want to expire the credentials for "${user.userName}"? They will need to reset their password.`
-                                : `Are you sure you want to activate the credentials for "${user.userName}"?`
-                              }
-                            </AlertDialogDescription>
-                          </AlertDialogHeader>
-                          <AlertDialogFooter>
-                            <AlertDialogCancel>Cancel</AlertDialogCancel>
-                            <AlertDialogAction onClick={() => handleStatusToggle('credentialsExpiry')}>
-                              {user.credentialsNonExpired ? "Expire Credentials" : "Activate Credentials"}
-                            </AlertDialogAction>
-                          </AlertDialogFooter>
-                        </AlertDialogContent>
-                      </AlertDialog>
-                    </div>
-                  </div>
-                  
-                  {/* Credentials Expiry Date Picker */}
-                  <div className="space-y-2">
-                    <Label className="text-sm font-medium">Credentials Expiry Date</Label>
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <Button
-                          variant="outline"
-                          className="w-full justify-start text-left font-normal"
-                          disabled={isUpdating}
-                        >
-                          <CalendarIcon className="mr-2 h-4 w-4" />
-                          {credentialsExpiryDate ? format(credentialsExpiryDate, "PPP") : 
-                            user.credentialsExpiryDate ? format(new Date(user.credentialsExpiryDate), "PPP") : 
-                            <span className="text-muted-foreground">No expiry date set</span>}
-                        </Button>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0" align="start">
-                        <div className="p-0">
-                          <Calendar
-                            mode="single"
-                            selected={credentialsExpiryDate}
-                            onSelect={(date) => {
-                              setCredentialsExpiryDate(date)
-                              if (date) {
-                                // Auto-update when date is selected
-                                const dateString = format(date, "yyyy-MM-dd")
-                                adminCtx.updateCredentialsExpiryDate(user.userId, dateString)
-                              }
-                            }}
-                            initialFocus
-                          />
-                          {(credentialsExpiryDate || user.credentialsExpiryDate) && (
-                            <div className="p-3 border-t">
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                className="w-full"
-                                onClick={() => {
-                                  setCredentialsExpiryDate(undefined)
-                                  // Clear the expiry date by setting it to null
-                                  adminCtx.updateCredentialsExpiryDate(user.userId, null)
-                                }}
-                              >
-                                Remove Expiry Date
-                              </Button>
-                            </div>
-                          )}
-                        </div>
-                      </PopoverContent>
-                    </Popover>
-                  </div>
+          {/* Right Column - Security Actions */}
+          <div className="space-y-4">
+            {/* Account Security Quick Actions */}
+            <div className="space-y-3 p-4 border rounded-lg">
+              <div className="flex items-center gap-2">
+                <Shield className="h-4 w-4 text-red-600" />
+                <Label className="font-medium">Security Actions</Label>
+              </div>
+              
+              {/* Account Lock */}
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  {user.accountNonLocked ? <Unlock className="h-4 w-4 text-green-600" /> : <Lock className="h-4 w-4 text-red-600" />}
+                  <span className="text-sm">{user.accountNonLocked ? "Unlocked" : "Locked"}</span>
                 </div>
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button variant="outline" size="sm" disabled={isUpdating}>
+                      {user.accountNonLocked ? "Lock" : "Unlock"}
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>{user.accountNonLocked ? "Lock" : "Unlock"} Account</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        {user.accountNonLocked 
+                          ? `Lock "${user.userName}"? They won't be able to log in.`
+                          : `Unlock "${user.userName}"? They will regain login access.`}
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogAction onClick={() => handleStatusToggle('lock')}>
+                        {user.accountNonLocked ? "Lock" : "Unlock"}
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              </div>
+
+              {/* 2FA Status */}
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  {user.twoFactorEnabled ? <ShieldCheck className="h-4 w-4 text-green-600" /> : <XCircle className="h-4 w-4 text-gray-400" />}
+                  <span className="text-sm">2FA {user.twoFactorEnabled ? "Enabled" : "Disabled"}</span>
+                </div>
+                {user.twoFactorEnabled && (
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button variant="destructive" size="sm" disabled={isUpdating}>
+                        Deactivate
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Deactivate 2FA</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          Deactivate two-factor authentication for "{user.userName}"? This will make their account less secure.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction 
+                          onClick={async () => {
+                            try {
+                              setIsUpdating(true)
+                              await adminCtx.deactivateTwoFactor(user.userId)
+                            } catch (error) {
+                              console.error("2FA deactivation error:", error)
+                            } finally {
+                              setIsUpdating(false)
+                            }
+                          }}
+                          className="bg-red-600 hover:bg-red-700"
+                        >
+                          Deactivate
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                )}
               </div>
             </div>
           </div>
         </div>
 
-        <Separator />
-        
+        {/* Advanced Settings - Collapsible */}
+        <Collapsible>
+          <CollapsibleTrigger asChild>
+            <Button variant="ghost" className="w-full justify-between p-4 h-auto">
+              <div className="flex items-center gap-2">
+                <Settings className="h-4 w-4" />
+                <span className="font-medium">Advanced Settings</span>
+              </div>
+              <ChevronDown className="h-4 w-4" />
+            </Button>
+          </CollapsibleTrigger>
+          <CollapsibleContent className="space-y-4 pt-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Account Expiry */}
+              <div className="p-4 border rounded-lg space-y-3">
+                <div className="flex items-center gap-2">
+                  <Clock className="h-4 w-4 text-purple-600" />
+                  <Label className="font-medium">Account Expiry</Label>
+                </div>
+                
+                <div className="flex items-center justify-between">
+                  <span className="text-sm">{user.accountNonExpired ? "Valid" : "Expired"}</span>
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button variant="outline" size="sm" disabled={isUpdating}>
+                        {user.accountNonExpired ? "Expire" : "Activate"}
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>{user.accountNonExpired ? "Expire" : "Activate"} Account</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          {user.accountNonExpired ? `Expire account for "${user.userName}"?` : `Activate account for "${user.userName}"?`}
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction onClick={() => handleStatusToggle('accountExpiry')}>
+                          {user.accountNonExpired ? "Expire" : "Activate"}
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                </div>
+                
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button variant="outline" size="sm" className="w-full justify-start text-left" disabled={isUpdating}>
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      <span className="text-xs">
+                        {accountExpiryDate ? format(accountExpiryDate, "MMM dd, yyyy") : 
+                          user.accountExpiryDate ? format(new Date(user.accountExpiryDate), "MMM dd, yyyy") : 
+                          "Set date"}
+                      </span>
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={accountExpiryDate}
+                      onSelect={(date) => {
+                        setAccountExpiryDate(date)
+                        if (date) {
+                          const dateString = format(date, "yyyy-MM-dd")
+                          adminCtx.updateAccountExpiryDate(user.userId, dateString)
+                        }
+                      }}
+                      initialFocus
+                    />
+                    {(accountExpiryDate || user.accountExpiryDate) && (
+                      <div className="p-3 border-t">
+                        <Button variant="outline" size="sm" className="w-full" onClick={() => {
+                          setAccountExpiryDate(undefined)
+                          adminCtx.updateAccountExpiryDate(user.userId, null)
+                        }}>
+                          Clear
+                        </Button>
+                      </div>
+                    )}
+                  </PopoverContent>
+                </Popover>
+              </div>
+
+              {/* Credentials Expiry */}
+              <div className="p-4 border rounded-lg space-y-3">
+                <div className="flex items-center gap-2">
+                  <Shield className="h-4 w-4 text-orange-600" />
+                  <Label className="font-medium">Credentials Expiry</Label>
+                </div>
+                
+                <div className="flex items-center justify-between">
+                  <span className="text-sm">{user.credentialsNonExpired ? "Valid" : "Expired"}</span>
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button variant="outline" size="sm" disabled={isUpdating}>
+                        {user.credentialsNonExpired ? "Expire" : "Activate"}
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>{user.credentialsNonExpired ? "Expire" : "Activate"} Credentials</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          {user.credentialsNonExpired 
+                            ? `Expire credentials for "${user.userName}"? They'll need to reset their password.`
+                            : `Activate credentials for "${user.userName}"?`}
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction onClick={() => handleStatusToggle('credentialsExpiry')}>
+                          {user.credentialsNonExpired ? "Expire" : "Activate"}
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                </div>
+                
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button variant="outline" size="sm" className="w-full justify-start text-left" disabled={isUpdating}>
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      <span className="text-xs">
+                        {credentialsExpiryDate ? format(credentialsExpiryDate, "MMM dd, yyyy") : 
+                          user.credentialsExpiryDate ? format(new Date(user.credentialsExpiryDate), "MMM dd, yyyy") : 
+                          "Set date"}
+                      </span>
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={credentialsExpiryDate}
+                      onSelect={(date) => {
+                        setCredentialsExpiryDate(date)
+                        if (date) {
+                          const dateString = format(date, "yyyy-MM-dd")
+                          adminCtx.updateCredentialsExpiryDate(user.userId, dateString)
+                        }
+                      }}
+                      initialFocus
+                    />
+                    {(credentialsExpiryDate || user.credentialsExpiryDate) && (
+                      <div className="p-3 border-t">
+                        <Button variant="outline" size="sm" className="w-full" onClick={() => {
+                          setCredentialsExpiryDate(undefined)
+                          adminCtx.updateCredentialsExpiryDate(user.userId, null)
+                        }}>
+                          Clear
+                        </Button>
+                      </div>
+                    )}
+                  </PopoverContent>
+                </Popover>
+              </div>
+            </div>
+          </CollapsibleContent>
+        </Collapsible>
+
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             Close
