@@ -40,15 +40,6 @@ import { Input } from "@/components/ui/input"
 import AdminContext from "@/context/AdminContext"
 import { format } from "date-fns"
 
-interface Log {
-  id: number
-  username: string
-  type: string
-  typeId: number
-  action: string
-  statusCode: string
-  createdAt: string
-}
 
 type SortField = "id" | "username" | "type" | "action" | "statusCode" | "createdAt"
 type SortDirection = "asc" | "desc"
