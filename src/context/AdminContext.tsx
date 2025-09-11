@@ -72,13 +72,25 @@ interface Baby {
   measurements: Measurement[]
 }
 
+interface Log {
+  id: number
+  username: string
+  type: string
+  typeId: number
+  action: string
+  statusCode: string
+  createdAt: string
+}
+
 interface AdminContextType {
   users: User[]
   babies: Baby[]
+  logs: Log[]
   loading: boolean
   error: string | null
   fetchUsers: () => Promise<void>
   fetchBabies: () => Promise<void>
+  fetchLogs: () => Promise<void>
   getUserById: (userId: number) => Promise<User | null>
   updateUserStatus: (userId: number, enabled: boolean) => Promise<void>
   updateUserRole: (userId: number, roleName: string) => Promise<void>
@@ -112,6 +124,7 @@ const normalizeExpiryDate = (date: string | null): string | null => {
 export function AdminProvider({ children }: { children: ReactNode }) {
   const [users, setUsers] = useState<User[]>([])
   const [babies, setBabies] = useState<Baby[]>([])
+  const [logs, setLogs] = useState<Log[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const authCtx = useContext(AuthContext)
@@ -221,6 +234,42 @@ export function AdminProvider({ children }: { children: ReactNode }) {
           ? err.message
           : (err as { response?: { data?: { message?: string } } })?.response
               ?.data?.message || "Error fetching babies"
+      setError(errorMessage)
+      toast.error(errorMessage)
+    } finally {
+      setLoading(false)
+    }
+  }, [])
+
+  const fetchLogs = useCallback(async () => {
+    try {
+      setLoading(true)
+      setError(null)
+
+      const token = localStorage.getItem("JWT_TOKEN")
+      const isAdmin = localStorage.getItem("IS_ADMIN")
+
+      if (!token) {
+        throw new Error("No authentication token found")
+      }
+
+      if (isAdmin !== "true") {
+        throw new Error("User does not have admin privileges")
+      }
+
+      const response = await api.get("/admin/logs")
+      const logsData = Array.isArray(response.data) ? response.data : []
+      
+      // Sort logs by id descending (newest first)
+      const sortedLogs = logsData.sort((a, b) => b.id - a.id)
+      setLogs(sortedLogs)
+    } catch (err) {
+      console.error("Admin logs fetch error:", err)
+      const errorMessage =
+        err instanceof Error
+          ? err.message
+          : (err as { response?: { data?: { message?: string } } })?.response
+              ?.data?.message || "Error fetching logs"
       setError(errorMessage)
       toast.error(errorMessage)
     } finally {
@@ -563,10 +612,12 @@ export function AdminProvider({ children }: { children: ReactNode }) {
   const contextValue: AdminContextType = {
     users,
     babies,
+    logs,
     loading,
     error,
     fetchUsers,
     fetchBabies,
+    fetchLogs,
     getUserById,
     updateUserStatus,
     updateUserRole,
