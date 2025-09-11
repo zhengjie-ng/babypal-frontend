@@ -42,6 +42,7 @@ interface DecodedToken {
   sub: string
   role?: Role
   exp?: number
+  is2faEnabled?: boolean
 }
 
 interface User {
@@ -50,9 +51,20 @@ interface User {
   role: Role
 }
 
+interface ProfileData {
+  username: string
+  password: string
+}
+
+interface LoginResult {
+  requiresTwoFA: boolean
+  jwtToken?: string
+}
+
 interface AuthContextType {
   signup: (data: SignupData) => Promise<void>
-  onLoginHandler: (data: LoginData) => Promise<void>
+  onLoginHandler: (data: LoginData) => Promise<LoginResult | void>
+  verify2FALogin: (code: string, jwtToken: string) => Promise<void>
   onPasswordForgotHandler: (data: ForgotPasswordData) => Promise<void>
   onResetPasswordHandler: (data: ResetPasswordData) => Promise<void>
   onLogoutHandler: () => void
@@ -67,6 +79,16 @@ interface AuthContextType {
   checkUserExists: (username: string) => Promise<boolean>
   credentialExpiredUser: string | null
   setCredentialExpiredUser: (username: string | null) => void
+  // Profile management functions
+  fetch2FAStatus: () => Promise<{ is2faEnabled: boolean }>
+  enable2FA: () => Promise<string>
+  disable2FA: () => Promise<void>
+  verify2FA: (code: string) => Promise<void>
+  updateCredentials: (data: ProfileData) => Promise<void>
+  updateAccountExpiryStatus: (expired: boolean) => Promise<void>
+  updateAccountLockStatus: (locked: boolean) => Promise<void>
+  updateAccountEnabledStatus: (enabled: boolean) => Promise<void>
+  updateCredentialsExpiryStatus: (expired: boolean) => Promise<void>
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -136,7 +158,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     navigate("/home")
   }
 
-  const onLoginHandler = async (data: LoginData) => {
+  const onLoginHandler = async (data: LoginData): Promise<LoginResult | void> => {
     try {
       setLoading(true)
       const loginData = {
@@ -148,19 +170,31 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       if (response.status === 200 && response.data.jwtToken) {
         const decodedToken = jwtDecode<DecodedToken>(response.data.jwtToken)
-        handleSuccessfulLogin(response.data.jwtToken, decodedToken)
-        toast.success("Login Successful")
+        
+        // Check if 2FA is enabled for this user
+        if (decodedToken.is2faEnabled) {
+          toast.success("Login successful! Please verify with 2FA.")
+          return {
+            requiresTwoFA: true,
+            jwtToken: response.data.jwtToken
+          }
+        } else {
+          // Normal login without 2FA
+          handleSuccessfulLogin(response.data.jwtToken, decodedToken)
+          toast.success("Login Successful")
+        }
       } else {
         toast.error(
           "Login failed. Please check your credentials and try again."
         )
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const apiError = error as { response?: { status?: number; data?: { message?: string; error?: string } } }
       console.log(error)
       
       // Check if it's a credential expired error
-      if (error.response?.status === 401) {
-        const errorMessage = error.response?.data?.message || error.response?.data?.error || ""
+      if (apiError.response?.status === 401) {
+        const errorMessage = apiError.response?.data?.message || apiError.response?.data?.error || ""
         
         if (errorMessage.toLowerCase().includes("credential") && 
             (errorMessage.toLowerCase().includes("expired") || errorMessage.toLowerCase().includes("expire"))) {
@@ -172,7 +206,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
       
       // Handle other login errors
-      const errorMessage = error.response?.data?.message || "Invalid credentials"
+      const errorMessage = apiError.response?.data?.message || "Invalid credentials"
       toast.error(errorMessage)
     } finally {
       setLoading(false)
@@ -297,9 +331,167 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }
 
+  // Profile management functions
+  const fetch2FAStatus = async (): Promise<{ is2faEnabled: boolean }> => {
+    try {
+      const response = await api.get("/auth/user/2fa-status")
+      return response.data
+    } catch (error) {
+      console.error("Error fetching 2FA status:", error)
+      throw error
+    }
+  }
+
+  const enable2FA = async (): Promise<string> => {
+    try {
+      const response = await api.post("/auth/enable-2fa")
+      return response.data
+    } catch (error) {
+      console.error("Error enabling 2FA:", error)
+      throw error
+    }
+  }
+
+  const disable2FA = async (): Promise<void> => {
+    try {
+      await api.post("/auth/disable-2fa")
+    } catch (error) {
+      console.error("Error disabling 2FA:", error)
+      throw error
+    }
+  }
+
+  const verify2FA = async (code: string): Promise<void> => {
+    try {
+      const formData = new URLSearchParams()
+      formData.append("code", code)
+
+      await api.post("/auth/verify-2fa", formData, {
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+      })
+    } catch (error) {
+      console.error("Error verifying 2FA:", error)
+      throw error
+    }
+  }
+
+  const updateCredentials = async (data: ProfileData): Promise<void> => {
+    try {
+      const formData = new URLSearchParams()
+      formData.append("token", token)
+      formData.append("newUsername", data.username)
+      formData.append("newPassword", data.password)
+
+      await api.post("/auth/update-credentials", formData, {
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+      })
+    } catch (error) {
+      console.error("Error updating credentials:", error)
+      throw error
+    }
+  }
+
+  const updateAccountExpiryStatus = async (expired: boolean): Promise<void> => {
+    try {
+      const formData = new URLSearchParams()
+      formData.append("token", token)
+      formData.append("expire", expired.toString())
+
+      await api.put("/auth/update-expiry-status", formData, {
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+      })
+    } catch (error) {
+      console.error("Error updating account expiry status:", error)
+      throw error
+    }
+  }
+
+  const updateAccountLockStatus = async (locked: boolean): Promise<void> => {
+    try {
+      const formData = new URLSearchParams()
+      formData.append("token", token)
+      formData.append("lock", locked.toString())
+
+      await api.put("/auth/update-lock-status", formData, {
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+      })
+    } catch (error) {
+      console.error("Error updating account lock status:", error)
+      throw error
+    }
+  }
+
+  const updateAccountEnabledStatus = async (enabled: boolean): Promise<void> => {
+    try {
+      const formData = new URLSearchParams()
+      formData.append("token", token)
+      formData.append("enabled", enabled.toString())
+
+      await api.put("/auth/update-enabled-status", formData, {
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+      })
+    } catch (error) {
+      console.error("Error updating account enabled status:", error)
+      throw error
+    }
+  }
+
+  const updateCredentialsExpiryStatus = async (expired: boolean): Promise<void> => {
+    try {
+      const formData = new URLSearchParams()
+      formData.append("token", token)
+      formData.append("expire", expired.toString())
+
+      await api.put("/auth/update-credentials-expiry-status", formData, {
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+      })
+    } catch (error) {
+      console.error("Error updating credentials expiry status:", error)
+      throw error
+    }
+  }
+
+  const verify2FALogin = async (code: string, jwtToken: string): Promise<void> => {
+    try {
+      setLoading(true)
+      const formData = new URLSearchParams()
+      formData.append("code", code)
+      formData.append("jwtToken", jwtToken)
+
+      await api.post("/auth/public/verify-2fa-login", formData, {
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+      })
+
+      const decodedToken = jwtDecode<DecodedToken>(jwtToken)
+      handleSuccessfulLogin(jwtToken, decodedToken)
+      toast.success("2FA verification successful!")
+    } catch (error) {
+      console.error("2FA verification error:", error)
+      toast.error("Invalid 2FA code. Please try again.")
+      throw error
+    } finally {
+      setLoading(false)
+    }
+  }
+
   const contextValue: AuthContextType = {
     signup,
     onLoginHandler,
+    verify2FALogin,
     onPasswordForgotHandler,
     onResetPasswordHandler,
     onLogoutHandler,
@@ -314,6 +506,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     checkUserExists,
     credentialExpiredUser,
     setCredentialExpiredUser,
+    // Profile management functions
+    fetch2FAStatus,
+    enable2FA,
+    disable2FA,
+    verify2FA,
+    updateCredentials,
+    updateAccountExpiryStatus,
+    updateAccountLockStatus,
+    updateAccountEnabledStatus,
+    updateCredentialsExpiryStatus,
   }
 
   return (
