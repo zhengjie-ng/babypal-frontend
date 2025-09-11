@@ -1,3 +1,10 @@
+# [1.1.0](https://github.com/zhengjie-ng/babypal-frontend/compare/v1.0.0...v1.1.0) (2025-09-11)
+
+
+### Features
+
+* semantic release to create new release in github ([c5ad245](https://github.com/zhengjie-ng/babypal-frontend/commit/c5ad2452cf5dcb991dc6258e7276a691487cc19c))
+
 # 1.0.0 (2025-09-11)
 
 
