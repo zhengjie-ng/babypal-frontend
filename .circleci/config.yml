@@ -102,6 +102,17 @@ jobs:
           name: Deploy to Netlify
           command: ./node_modules/.bin/netlify deploy --site $NETLIFY_SITE_ID --auth $NETLIFY_ACCESS_TOKEN --prod --dir=dist
 
+  release:
+    docker:
+      - image: cimg/node:22.19
+    steps:
+      - checkout
+      - node/install-packages:
+          pkg-manager: npm
+      - run:
+          name: Run semantic-release
+          command: npm run semantic-release
+
 workflows:
   workflow-develop:
     jobs:
@@ -178,6 +189,12 @@ workflows:
             - publish
             - scan
             - snyk_sast
+          filters:
+            branches:
+              only: release
+      - release:
+          requires:
+            - deploy
           filters:
             branches:
               only: release
