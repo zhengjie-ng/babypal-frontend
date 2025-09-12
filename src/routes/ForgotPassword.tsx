@@ -13,6 +13,7 @@ import { Loader2, ArrowLeft, Mail } from "lucide-react"
 import { Link } from "react-router-dom"
 import { useContext, useState } from "react"
 import AuthContext from "@/context/AuthContext"
+import { ThemeToggle } from "@/components/theme-toggle"
 
 function ForgotPassword() {
   const authCtx = useContext(AuthContext)
@@ -29,8 +30,12 @@ function ForgotPassword() {
 
   if (isSubmitted) {
     return (
-      <div className="container flex min-h-screen w-screen flex-col items-center justify-center">
-        <div className={cn("flex flex-col gap-6 w-full max-w-md")}>
+      <div className="relative min-h-screen w-full flex items-center justify-center">
+        {/* Theme Toggle in top-right corner */}
+        <div className="absolute top-4 right-4 z-50">
+          <ThemeToggle />
+        </div>
+        <div className={cn("flex flex-col gap-6 w-full max-w-md mx-auto")}>
           <Card className="border-2">
             <CardHeader className="space-y-1 text-center">
               <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-green-100">
@@ -68,8 +73,12 @@ function ForgotPassword() {
   }
 
   return (
-    <div className="container flex min-h-screen w-screen flex-col items-center justify-center">
-      <div className={cn("flex flex-col gap-6 w-full max-w-md")}>
+    <div className="relative min-h-screen w-full flex items-center justify-center">
+      {/* Theme Toggle in top-right corner */}
+      <div className="absolute top-4 right-4 z-50">
+        <ThemeToggle />
+      </div>
+      <div className={cn("flex flex-col gap-6 w-full max-w-md mx-auto")}>
         <Card className="border-2">
           <CardHeader className="space-y-1 text-center">
             <CardTitle className="text-2xl">Forgot your password?</CardTitle>
