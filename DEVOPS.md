@@ -231,13 +231,13 @@ SNYK_TOKEN=<snyk-api-token>
 
 ### Typical Pipeline Execution Times
 
-- **Build**: ~2-3 minutes
-- **Test**: ~1-2 minutes  
-- **Security Scans**: ~3-5 minutes
-- **Docker Build/Push**: ~2-4 minutes
-- **Deployment**: ~2-3 minutes
+- **Build**: 30~ seconds
+- **Test**: 2~ minutes 
+- **Security Scans**: 1~ minute
+- **Docker Build/Push**: 1~ minute
+- **Deployment**: 1~ minute
 
-**Total Pipeline Time**: ~10-17 minutes for full release workflow
+**Total Pipeline Time**: 5~ minutes for full release workflow
 
 ## 🚀 Deployment Targets
 
@@ -272,6 +272,78 @@ SNYK_TOKEN=<snyk-api-token>
 - **Multi-environment**: Staging environment deployment
 - **Blue-Green Deployment**: Zero-downtime deployment strategy
 - **Kubernetes**: Container orchestration for scalability
+
+## **Infrastructure as Code (IaC): Terraform or Pulumi Integration**
+Instead of manually clicking through AWS console to set up servers, databases, and networks, Infrastructure as Code lets you define your entire infrastructure using configuration files. Think of it like having a recipe that automatically builds your entire server setup.
+
+**Benefits:**
+- **Reproducibility**: Spin up identical environments instantly
+- **Version control**: Track infrastructure changes like code changes
+- **Disaster recovery**: Rebuild everything from scratch in minutes
+- **Collaboration**: Team members can review infrastructure changes
+
+## **Monitoring: APM Integration (DataDog, New Relic)**
+Application Performance Monitoring (APM) tools are like having a doctor continuously checking your app's vital signs. They track response times, error rates, database queries, and user behavior in real-time.
+
+**What you get:**
+- **Real-time alerts**: Get notified when things break before users complain
+- **Performance insights**: See which API endpoints are slow
+- **Error tracking**: Automatically capture and categorize crashes
+- **User experience monitoring**: Track how fast pages load for actual users
+
+## **Performance Testing: Lighthouse CI Integration**
+Lighthouse CI automatically tests your website's performance, accessibility, and best practices every time you deploy. It's like having an automated quality inspector.
+
+**What it measures:**
+- **Page load speed**: How fast your site loads on different devices
+- **Accessibility**: Whether disabled users can use your site
+- **SEO optimization**: How search-engine friendly your site is
+- **Best practices**: Security, modern web standards compliance
+
+## **Multi-environment: Staging Environment Deployment**
+A staging environment is like a dress rehearsal before the real performance. It's an exact copy of your production environment where you test changes before they go live.
+
+**Why it's crucial:**
+- **Safe testing**: Test new features without risking the live site
+- **Bug catching**: Find issues that only appear in production-like conditions
+- **Client demos**: Show new features to stakeholders safely
+- **Rollback practice**: Test your disaster recovery procedures
+
+## **Blue-Green Deployment: Zero-Downtime Strategy**
+Imagine having two identical stages (Blue and Green). While users are watching the show on the Blue stage, you set up the new performance on the Green stage. When ready, you instantly switch the spotlight to Green. Users never see a curtain drop.
+
+**How it works:**
+- **Blue environment**: Currently serving users
+- **Green environment**: New version being prepared
+- **Instant switch**: Traffic redirected from Blue to Green
+- **Quick rollback**: Switch back to Blue if problems occur
+
+## **Kubernetes: Container Orchestration for Scalability**
+Kubernetes is like having an intelligent operations manager for your applications. It automatically handles scaling, load balancing, health checks, and recovery across multiple servers.
+
+**Key capabilities:**
+- **Auto-scaling**: Automatically add/remove servers based on traffic
+- **Self-healing**: Restart failed containers automatically
+- **Load distribution**: Spread traffic across multiple instances
+- **Rolling updates**: Update your app without downtime
+- **Resource management**: Efficiently allocate CPU and memory
+
+### Technical Challenges Encountered
+
+**Infrastructure and Deployment Issues**
+- **Initial hosting limitations**: BabyPal's backend was originally deployed on Heroku's free tier, which introduced significant latency issues due to server locations being limited to the US and Europe. This led to poor performance for users in other regions, prompting a migration to AWS Elastic Beanstalk for better global accessibility.
+
+- **SSL/HTTPS configuration**: AWS Elastic Beanstalk's free tier only supports HTTP connections. To enable HTTPS for secure communications, we implemented AWS CloudFront as a CDN layer, which added SSL termination capabilities while maintaining cost efficiency.
+
+**Environment-Specific Bugs**
+- **Production vs. development discrepancies**: Several features that functioned correctly in the local development environment failed when deployed to production, including:
+  - CSRF (Cross-Site Request Forgery) protection mechanisms
+  - OAuth integration with Google and GitHub authentication services
+
+**Database Migration Complications**
+- **Cost-driven database transition**: As usage grew, Neon database began incurring charges, necessitating a migration to AWS RDS for better cost control and integration with our existing AWS infrastructure.
+
+- **Data type compatibility issues**: During the migration process, column data types were incorrectly mapped between Neon and AWS RDS, causing application-breaking errors.
 
 ---
 
