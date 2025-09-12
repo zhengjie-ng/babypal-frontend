@@ -16,7 +16,11 @@ api.interceptors.request.use(
   async (config) => {
     const token = localStorage.getItem("JWT_TOKEN")
     if (token) {
+      console.log("API Interceptor - Adding token to request:", config.url)
+      console.log("Token preview:", token.substring(0, 50) + "...")
       config.headers.Authorization = `Bearer ${token}`
+    } else {
+      console.log("API Interceptor - No token found for request:", config.url)
     }
 
     // Add additional headers for CORS

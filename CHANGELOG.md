@@ -1,3 +1,25 @@
+## [1.4.1](https://github.com/zhengjie-ng/babypal-frontend/compare/v1.4.0...v1.4.1) (2025-09-12)
+
+
+### Bug Fixes
+
+* Use VITE_OAUTH_URL for oauth url ([49f8ce6](https://github.com/zhengjie-ng/babypal-frontend/commit/49f8ce62336b803e5ccdbcbb22cff4b62c1ace0d))
+
+# [1.4.0](https://github.com/zhengjie-ng/babypal-frontend/compare/v1.3.0...v1.4.0) (2025-09-12)
+
+
+### Bug Fixes
+
+* Center forgot-password ui ([45ffce8](https://github.com/zhengjie-ng/babypal-frontend/commit/45ffce80bfe627237afa3d89b09310a2fe6cd0c0))
+* Night mode toggle at login, signup and forgot password page ([3671986](https://github.com/zhengjie-ng/babypal-frontend/commit/3671986ca416ca03d89b40ce8f50f69ac88ac8b4))
+* test ([e2f11cf](https://github.com/zhengjie-ng/babypal-frontend/commit/e2f11cf25dfa3ac4a339e2811754f965cf1b2e5c))
+
+
+### Features
+
+* Add Oauth sign in ([33962ed](https://github.com/zhengjie-ng/babypal-frontend/commit/33962ed5840bd2a1b8450045d704252d02044402))
+* Implement Google and Github sign in ([cb56d67](https://github.com/zhengjie-ng/babypal-frontend/commit/cb56d67da4d0e27f71bfb7b55f0c19840472c750))
+
 # [1.3.0](https://github.com/zhengjie-ng/babypal-frontend/compare/v1.2.0...v1.3.0) (2025-09-11)
 
 

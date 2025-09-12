@@ -20,6 +20,7 @@ import { MeasurementProvider } from "./context/MeasurementContext"
 import ForgotPassword from "./routes/ForgotPassword"
 import ResetPassword from "./routes/ResetPassword"
 import Profile from "./routes/Profile"
+import OAuth2RedirectHandler from "./components/OAuth2RedirectHandler"
 
 function App() {
   return (
@@ -43,6 +44,10 @@ function App() {
                       <Route
                         path="/reset-password"
                         element={<ResetPassword />}
+                      />
+                      <Route
+                        path="/oauth2/redirect"
+                        element={<OAuth2RedirectHandler />}
                       />
                       <Route path="/" element={<Navbar05 />}>
                         <Route path="/" element={<NavBaby />}>

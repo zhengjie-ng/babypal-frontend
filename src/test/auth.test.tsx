@@ -35,7 +35,9 @@ describe("Authentication", () => {
     // Check if essential elements are present
     expect(screen.getByLabelText(/username/i)).toBeInTheDocument()
     expect(screen.getByLabelText(/password/i)).toBeInTheDocument()
-    expect(screen.getByRole("button", { name: /sign in/i })).toBeInTheDocument()
+    expect(screen.getByRole("button", { name: /^sign in$/i })).toBeInTheDocument()
+    expect(screen.getByRole("button", { name: /sign in with google/i })).toBeInTheDocument()
+    expect(screen.getByRole("button", { name: /sign in with github/i })).toBeInTheDocument()
   })
 
   it("should disable submit button while loading", async () => {
@@ -62,7 +64,7 @@ describe("Authentication", () => {
       </BrowserRouter>
     )
 
-    const submitButton = screen.getByRole("button", { name: /sign in/i })
+    const submitButton = screen.getByRole("button", { name: /^sign in$/i })
 
     // Fill in required form fields
     fireEvent.change(screen.getByLabelText(/username/i), {
@@ -106,7 +108,7 @@ describe("Authentication", () => {
     })
 
     // Submit the form
-    fireEvent.click(screen.getByRole("button", { name: /sign in/i }))
+    fireEvent.click(screen.getByRole("button", { name: /^sign in$/i }))
 
     // Verify form submission was attempted
     expect(
