@@ -328,7 +328,9 @@ Kubernetes is like having an intelligent operations manager for your application
 - **Rolling updates**: Update your app without downtime
 - **Resource management**: Efficiently allocate CPU and memory
 
-### Technical Challenges Encountered
+---
+
+## Technical Challenges Encountered
 
 **Infrastructure and Deployment Issues**
 - **Initial hosting limitations**: BabyPal's backend was originally deployed on Heroku's free tier, which introduced significant latency issues due to server locations being limited to the US and Europe. This led to poor performance for users in other regions, prompting a migration to AWS Elastic Beanstalk for better global accessibility.
