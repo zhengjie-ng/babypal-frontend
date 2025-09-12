@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
 import { Loader2, Eye, EyeOff, ArrowLeft } from "lucide-react"
+import { FaGoogle, FaGithub } from "react-icons/fa"
 import { Link } from "react-router-dom"
 import { useContext, useState } from "react"
 import AuthContext from "@/context/AuthContext"
@@ -75,6 +76,43 @@ export function LoginForm({
               </CardDescription>
             </CardHeader>
             <CardContent>
+              {/* OAuth Sign-in Buttons */}
+              <div className="grid gap-4 mb-6">
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full shadow-sm"
+                  onClick={() => {
+                    window.location.href = "http://localhost:8080/oauth2/authorization/google"
+                  }}
+                >
+                  <FaGoogle className="mr-2 h-4 w-4 text-black" />
+                  Sign in with Google
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full shadow-sm"
+                  onClick={() => {
+                    window.location.href = "http://localhost:8080/oauth2/authorization/github"
+                  }}
+                >
+                  <FaGithub className="mr-2 h-4 w-4" />
+                  Sign in with GitHub
+                </Button>
+              </div>
+              
+              <div className="relative mb-6">
+                <div className="absolute inset-0 flex items-center">
+                  <span className="w-full border-t" />
+                </div>
+                <div className="relative flex justify-center text-xs uppercase">
+                  <span className="bg-background px-2 text-muted-foreground">
+                    Or continue with
+                  </span>
+                </div>
+              </div>
+
               <form onSubmit={handleSubmit} className="relative">
                 <div className="grid gap-6">
                   <div className="grid gap-4">
@@ -147,7 +185,7 @@ export function LoginForm({
                       )}
                     </Button>
                   </div>
-                  <div className="relative text-center">
+                  <div className="relative text-center mt-4">
                     <div className="absolute inset-0 flex items-center">
                       <span className="w-full border-t" />
                     </div>
