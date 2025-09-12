@@ -83,8 +83,7 @@ export function LoginForm({
                   variant="outline"
                   className="w-full shadow-sm"
                   onClick={() => {
-                    window.location.href =
-                      `${import.meta.env.VITE_API_URL}/oauth2/authorization/google`
+                    window.location.href = `${import.meta.env.VITE_OAUTH_URL}/oauth2/authorization/google`
                   }}
                 >
                   <FaGoogle className="mr-2 h-4 w-4 text-black" />
@@ -95,8 +94,7 @@ export function LoginForm({
                   variant="outline"
                   className="w-full shadow-sm"
                   onClick={() => {
-                    window.location.href =
-                      `${import.meta.env.VITE_API_URL}/oauth2/authorization/github`
+                    window.location.href = `${import.meta.env.VITE_OAUTH_URL}/oauth2/authorization/github`
                   }}
                 >
                   <FaGithub className="mr-2 h-4 w-4" />
