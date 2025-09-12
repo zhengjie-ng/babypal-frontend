@@ -1,3 +1,10 @@
+## [1.4.1](https://github.com/zhengjie-ng/babypal-frontend/compare/v1.4.0...v1.4.1) (2025-09-12)
+
+
+### Bug Fixes
+
+* Use VITE_OAUTH_URL for oauth url ([49f8ce6](https://github.com/zhengjie-ng/babypal-frontend/commit/49f8ce62336b803e5ccdbcbb22cff4b62c1ace0d))
+
 # [1.4.0](https://github.com/zhengjie-ng/babypal-frontend/compare/v1.3.0...v1.4.0) (2025-09-12)
 
 
