@@ -17,7 +17,11 @@ export const formatDate = (
   formatString: string = "MMMM d, yyyy 'at' h:mm a"
 ) => {
   try {
-    return format(parseISO(date), formatString)
+    const parsedDate = parseISO(date)
+    if (isNaN(parsedDate.getTime())) {
+      return date
+    }
+    return format(parsedDate, formatString)
   } catch (error) {
     console.error("Error formatting date:", error)
     return date
