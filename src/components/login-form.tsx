@@ -84,7 +84,7 @@ export function LoginForm({
                   className="w-full shadow-sm"
                   onClick={() => {
                     window.location.href =
-                      "http://localhost:8080/oauth2/authorization/google"
+                      `${import.meta.env.VITE_API_URL}/oauth2/authorization/google`
                   }}
                 >
                   <FaGoogle className="mr-2 h-4 w-4 text-black" />
@@ -96,7 +96,7 @@ export function LoginForm({
                   className="w-full shadow-sm"
                   onClick={() => {
                     window.location.href =
-                      "http://localhost:8080/oauth2/authorization/github"
+                      `${import.meta.env.VITE_API_URL}/oauth2/authorization/github`
                   }}
                 >
                   <FaGithub className="mr-2 h-4 w-4" />
