@@ -2,10 +2,16 @@ import { FaBaby } from "react-icons/fa"
 import { motion } from "framer-motion"
 import { Link } from "react-router-dom"
 import { SignupForm } from "../components/signup-form"
+import { ThemeToggle } from "@/components/theme-toggle"
 
 export default function SignupPage() {
   return (
     <div className="from-primary/5 via-background to-muted min-h-svh bg-gradient-to-br">
+      {/* Theme Toggle in top-right corner */}
+      <div className="absolute top-4 right-4 z-50">
+        <ThemeToggle />
+      </div>
+      
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}

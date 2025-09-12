@@ -1,10 +1,16 @@
 import { FaBaby } from "react-icons/fa"
 import { LoginForm } from "@/components/login-form"
+import { ThemeToggle } from "@/components/theme-toggle"
 import { Link } from "react-router-dom"
 
 export default function LoginPage() {
   return (
     <div className="from-primary/5 via-background to-muted min-h-svh w-full bg-gradient-to-br">
+      {/* Theme Toggle in top-right corner */}
+      <div className="absolute top-4 right-4 z-50">
+        <ThemeToggle />
+      </div>
+      
       <div className="">
         <div className="absolute top-1/2 left-1/2 w-full -translate-x-1/2 -translate-y-1/2">
           <div className="mx-auto flex max-w-[400px] flex-col items-center justify-center gap-8">

@@ -72,18 +72,19 @@ export function LoginForm({
             <CardHeader className="space-y-1 text-center">
               <CardTitle className="text-2xl">Welcome back</CardTitle>
               <CardDescription>
-                Enter your credentials to access your account
+                Login with your Google account or Github account
               </CardDescription>
             </CardHeader>
             <CardContent>
               {/* OAuth Sign-in Buttons */}
-              <div className="grid gap-4 mb-6">
+              <div className="mb-6 grid gap-4">
                 <Button
                   type="button"
                   variant="outline"
                   className="w-full shadow-sm"
                   onClick={() => {
-                    window.location.href = "http://localhost:8080/oauth2/authorization/google"
+                    window.location.href =
+                      "http://localhost:8080/oauth2/authorization/google"
                   }}
                 >
                   <FaGoogle className="mr-2 h-4 w-4 text-black" />
@@ -94,20 +95,21 @@ export function LoginForm({
                   variant="outline"
                   className="w-full shadow-sm"
                   onClick={() => {
-                    window.location.href = "http://localhost:8080/oauth2/authorization/github"
+                    window.location.href =
+                      "http://localhost:8080/oauth2/authorization/github"
                   }}
                 >
                   <FaGithub className="mr-2 h-4 w-4" />
                   Sign in with GitHub
                 </Button>
               </div>
-              
+
               <div className="relative mb-6">
                 <div className="absolute inset-0 flex items-center">
                   <span className="w-full border-t" />
                 </div>
                 <div className="relative flex justify-center text-xs uppercase">
-                  <span className="bg-background px-2 text-muted-foreground">
+                  <span className="bg-background text-muted-foreground px-2">
                     Or continue with
                   </span>
                 </div>
@@ -133,7 +135,10 @@ export function LoginForm({
                     </div>
                     <div className="space-y-2">
                       <div className="flex items-center">
-                        <Label htmlFor="password" className="text-sm font-medium">
+                        <Label
+                          htmlFor="password"
+                          className="text-sm font-medium"
+                        >
                           Password
                         </Label>
                         <Link
@@ -151,20 +156,20 @@ export function LoginForm({
                           value={formData.password}
                           onChange={handleInputChange}
                           required
-                          className="shadow-sm pr-10"
+                          className="pr-10 shadow-sm"
                           autoComplete="current-password"
                         />
                         <Button
                           type="button"
                           variant="ghost"
                           size="sm"
-                          className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                          className="absolute top-0 right-0 h-full px-3 py-2 hover:bg-transparent"
                           onClick={() => setShowPassword(!showPassword)}
                         >
                           {showPassword ? (
-                            <EyeOff className="h-4 w-4 text-muted-foreground" />
+                            <EyeOff className="text-muted-foreground h-4 w-4" />
                           ) : (
-                            <Eye className="h-4 w-4 text-muted-foreground" />
+                            <Eye className="text-muted-foreground h-4 w-4" />
                           )}
                         </Button>
                       </div>
@@ -185,11 +190,11 @@ export function LoginForm({
                       )}
                     </Button>
                   </div>
-                  <div className="relative text-center mt-4">
+                  <div className="relative mt-4 text-center">
                     <div className="absolute inset-0 flex items-center">
                       <span className="w-full border-t" />
                     </div>
-                    <span className="relative bg-background text-muted-foreground px-2 text-sm">
+                    <span className="bg-background text-muted-foreground relative px-2 text-sm">
                       New to BabyPal?
                     </span>
                   </div>
@@ -229,7 +234,7 @@ export function LoginForm({
                         value={formData.code}
                         onChange={handleInputChange}
                         required
-                        className="shadow-sm text-center text-lg tracking-widest"
+                        className="text-center text-lg tracking-widest shadow-sm"
                         autoComplete="one-time-code"
                         maxLength={6}
                       />
@@ -260,7 +265,7 @@ export function LoginForm({
                     onClick={() => {
                       setStep(1)
                       setJwtToken("")
-                      setFormData(prev => ({ ...prev, code: "" }))
+                      setFormData((prev) => ({ ...prev, code: "" }))
                     }}
                   >
                     <ArrowLeft className="mr-2 h-4 w-4" />
@@ -272,7 +277,7 @@ export function LoginForm({
           </>
         )}
       </Card>
-      
+
       {/* Credential Expired Dialog */}
       <CredentialExpiredDialog
         open={!!authCtx?.credentialExpiredUser}
