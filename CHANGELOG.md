@@ -1,3 +1,10 @@
+## [1.4.2](https://github.com/zhengjie-ng/babypal-frontend/compare/v1.4.1...v1.4.2) (2025-10-05)
+
+
+### Bug Fixes
+
+* to not test ([670fcbb](https://github.com/zhengjie-ng/babypal-frontend/commit/670fcbbcddce82962adb6258b78bad05b07110ba))
+
 ## [1.4.1](https://github.com/zhengjie-ng/babypal-frontend/compare/v1.4.0...v1.4.1) (2025-09-12)
 
 
