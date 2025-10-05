@@ -37,7 +37,7 @@ export function GrowthGuideProvider({ children }: { children: ReactNode }) {
       setGrowthGuide(response.data)
     } catch (error) {
       toast.error("Failed to fetch growth guide")
-      console.log(error)
+      // console.log(error)
       setGrowthGuide(null)
     } finally {
       setLoading(false)

@@ -66,7 +66,7 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      console.log("Unauthorized access")
+      // console.log("Unauthorized access")
       // Clear CSRF token on 401 as it might be expired
       localStorage.removeItem("CSRF_TOKEN")
       // localStorage.removeItem("JWT_TOKEN")
@@ -83,7 +83,7 @@ api.interceptors.response.use(
       error.response?.status === 403 &&
       error.response?.data?.message?.includes("disabled")
     ) {
-      console.log("User account is disabled")
+      // console.log("User account is disabled")
       localStorage.removeItem("JWT_TOKEN")
       localStorage.removeItem("USER")
       localStorage.removeItem("CSRF_TOKEN")
