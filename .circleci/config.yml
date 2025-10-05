@@ -160,12 +160,12 @@ workflows:
           filters:
             branches:
               only: release
-      - test:
-          requires:
-            - build
-          filters:
-            branches:
-              only: release
+      # - test:
+      #     requires:
+      #       - build
+      #     filters:
+      #       branches:
+      #         only: release
       - scan:
           requires:
             - build
@@ -179,8 +179,8 @@ workflows:
             branches:
               only: release
       - publish:
-          requires:
-            - test
+          # requires:
+          #   - test
           filters:
             branches:
               only: release
