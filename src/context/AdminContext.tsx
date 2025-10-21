@@ -139,18 +139,18 @@ export function AdminProvider({ children }: { children: ReactNode }) {
       const token = localStorage.getItem("JWT_TOKEN")
       const isAdmin = localStorage.getItem("IS_ADMIN")
 
-      console.log("Debug - Admin Context State:", {
-        hasToken: !!token,
-        tokenLength: token?.length || 0,
-        isAdmin: isAdmin,
-      })
+      // console.log("Debug - Admin Context State:", {
+      //   hasToken: !!token,
+      //   tokenLength: token?.length || 0,
+      //   isAdmin: isAdmin,
+      // })
 
       // Debug: Log the actual token being sent
-      console.log("Debug - JWT Token:", {
-        tokenExists: !!token,
-        tokenStart: token?.substring(0, 20) + "...",
-        authHeader: `Bearer ${token?.substring(0, 20)}...`,
-      })
+      // console.log("Debug - JWT Token:", {
+      //   tokenExists: !!token,
+      //   tokenStart: token?.substring(0, 20) + "...",
+      //   authHeader: `Bearer ${token?.substring(0, 20)}...`,
+      // })
 
       if (!token) {
         throw new Error("No authentication token found")
@@ -161,7 +161,7 @@ export function AdminProvider({ children }: { children: ReactNode }) {
       }
 
       // Debug: Create a test request to see what headers are actually sent
-      console.log("Debug - Making admin request with headers...")
+      // console.log("Debug - Making admin request with headers...")
 
       const response = await api.get("/admin/get-users")
       const usersData = Array.isArray(response.data) ? response.data : []

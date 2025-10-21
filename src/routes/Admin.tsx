@@ -291,7 +291,7 @@ function Admin() {
   }
 
   const getUserRoleBadge = (user: User) => {
-    console.log("Debug - User role:", user.role)
+    // console.log("Debug - User role:", user.role)
     const isAdmin = user.role && user.role.roleName === "ROLE_ADMIN"
 
     return (

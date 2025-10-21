@@ -132,7 +132,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           const decoded = jwtDecode<DecodedToken>(token)
           if (decoded.exp && decoded.exp * 1000 < Date.now()) {
             // Token has expired
-            console.log("Token expired")
+            // console.log("Token expired")
             onLogoutHandler()
             return
           }
@@ -190,7 +190,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
     } catch (error: unknown) {
       const apiError = error as { response?: { status?: number; data?: { message?: string; error?: string } } }
-      console.log(error)
+      // console.log(error)
       
       // Check if it's a credential expired error
       if (apiError.response?.status === 401) {
@@ -298,7 +298,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       //showing success message
       toast.success("Password reset email sent! Check your inbox.")
     } catch (error) {
-      console.log(error)
+      // console.log(error)
       toast.error("Error sending password reset email. Please try again.")
     } finally {
       setLoading(false)
@@ -324,7 +324,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       toast.success("Password reset successful! You can now log in.")
       navigate("/login")
     } catch (error) {
-      console.log(error)
+      // console.log(error)
       toast.error("Error resetting password. Please try again.")
     } finally {
       setLoading(false)

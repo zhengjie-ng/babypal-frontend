@@ -29,9 +29,9 @@ const OAuth2RedirectHandler = () => {
     const token = params.get("token")
     const error = params.get("error")
 
-    console.log("OAuth2RedirectHandler: Params:", params.toString())
-    console.log("OAuth2RedirectHandler: Token:", token)
-    console.log("OAuth2RedirectHandler: Error:", error)
+    // console.log("OAuth2RedirectHandler: Params:", params.toString())
+    // console.log("OAuth2RedirectHandler: Token:", token)
+    // console.log("OAuth2RedirectHandler: Error:", error)
 
     if (error) {
       console.error("OAuth2 authentication error:", error)
@@ -42,12 +42,12 @@ const OAuth2RedirectHandler = () => {
 
     if (token && authCtx) {
       try {
-        console.log("Raw JWT Token from OAuth:", token)
+        // console.log("Raw JWT Token from OAuth:", token)
         const decodedToken = jwtDecode<DecodedToken>(token)
-        console.log("Decoded Token:", decodedToken)
-        console.log("Token expiry:", decodedToken.exp, new Date(decodedToken.exp! * 1000))
-        console.log("Username from token:", decodedToken.sub)
-        console.log("Roles from token:", decodedToken.roles)
+        // console.log("Decoded Token:", decodedToken)
+        // console.log("Token expiry:", decodedToken.exp, new Date(decodedToken.exp! * 1000))
+        // console.log("Username from token:", decodedToken.sub)
+        // console.log("Roles from token:", decodedToken.roles)
 
         // Store token in localStorage
         localStorage.setItem("JWT_TOKEN", token)
@@ -65,7 +65,7 @@ const OAuth2RedirectHandler = () => {
             : decodedToken.role || { roleId: 1, roleName: "ROLE_USER" },
         }
 
-        console.log("User Object:", user)
+        // console.log("User Object:", user)
         localStorage.setItem("USER", JSON.stringify(user))
 
         // Update context state
@@ -84,7 +84,7 @@ const OAuth2RedirectHandler = () => {
         
         // Delay navigation to ensure local storage operations complete
         setTimeout(() => {
-          console.log("Navigating to /home")
+          // console.log("Navigating to /home")
           navigate("/home")
         }, 100)
       } catch (error) {
@@ -93,7 +93,7 @@ const OAuth2RedirectHandler = () => {
         navigate("/login")
       }
     } else {
-      console.log("Token not found in URL, redirecting to login")
+      // console.log("Token not found in URL, redirecting to login")
       hasProcessedRef.current = true
       navigate("/login")
     }
