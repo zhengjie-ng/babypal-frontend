@@ -1,3 +1,10 @@
+## [1.4.3](https://github.com/zhengjie-ng/babypal-frontend/compare/v1.4.2...v1.4.3) (2025-10-21)
+
+
+### Bug Fixes
+
+* Growth data ([26b448b](https://github.com/zhengjie-ng/babypal-frontend/commit/26b448bc69b3a3e8a4f455520fb57f049fc7b94a))
+
 ## [1.4.2](https://github.com/zhengjie-ng/babypal-frontend/compare/v1.4.1...v1.4.2) (2025-10-05)
 
 
