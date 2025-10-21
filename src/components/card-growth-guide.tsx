@@ -18,9 +18,12 @@ export function CardGrowthGuide() {
   }, [babyCtx?.currentBaby?.dateOfBirth])
 
   // Memoize the growth guide ID to prevent unnecessary API calls
+  // Map baby age to growth guide ID (1:1 mapping for months 0-48)
+  // IDs 1-49 cover months 0-48
   const growthGuideId = useMemo(() => {
     if (babyMonths === null) return null
-    return Math.min(babyMonths, 29)
+    if (babyMonths <= 48) return babyMonths + 1 // 0->1, 1->2, ..., 48->49
+    return null // No growth guide available for children older than 48 months
   }, [babyMonths])
 
   useEffect(() => {
@@ -33,8 +36,8 @@ export function CardGrowthGuide() {
     return null
   }
 
-  // Don't show the card if baby is older than 29 months (no growth guide available)
-  if (babyMonths > 29) {
+  // Don't show the card if baby is older than 30 months (no growth guide available)
+  if (growthGuideId === null || babyMonths >= 30) {
     return null
   }
 
